@@ -1,4 +1,7 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { compose } from "redux";
+import PropTypes from "prop-types";
 import {
   Card,
   Container,
@@ -14,45 +17,40 @@ import {
   ListGroup,
   ListGroupItem,
 } from "reactstrap";
-import { withSocket } from "./SocketContext";
 import Message from "./Message";
+import {
+  sendMsg,
+  recieveMsg,
+  getRoomUsers,
+  leaveRoom,
+} from "../redux/actions/SocketActions";
 import { withRouter } from "react-router-dom";
 
 class Chat extends Component {
+  static propTypes = {
+    socket: PropTypes.object.isRequired,
+  };
+
   scrollToBottom = () => {
     this.el.scrollIntoView({ behaviour: "smooth" });
   };
+
   componentDidMount() {
-    try {
-      const { socket } = this.props;
-      const room_id = this.props.match.params.id;
-      const name = this.props.location.state.name;
-
-      socket.emit("join_room", room_id, name);
-
+    const { socket, room_id, name } = this.props.socket;
+    if (!socket || !room_id || !name) this.props.history.push("/");
+    else {
       socket.on("recieve_msg", (msg) => {
-        this.setState({
-          chat: [...this.state.chat, msg],
-        });
+        this.props.recieveMsg(msg);
       });
 
       socket.on("room_users", (users) => {
-        if (users) this.setState({ users });
+        this.props.getRoomUsers(users);
       });
-
-      this.setState({
-        socket,
-        name,
-        room_id,
-      });
-    } catch (err) {
-      this.props.history.push("/");
     }
   }
 
   state = {
     users: [],
-    chat: [],
     message: "",
     socket: null,
   };
@@ -61,6 +59,13 @@ class Chat extends Component {
     this.scrollToBottom();
   }
 
+  componentWillUnmount() {
+    const { socket } = this.props.socket;
+    if (socket) {
+      socket.removeAllListeners();
+      this.props.leaveRoom(socket);
+    }
+  }
   onChangeHandler = (e) => {
     this.setState({
       [e.target.name]: e.target.value,
@@ -68,12 +73,13 @@ class Chat extends Component {
   };
   onSubmitHandler = (e) => {
     e.preventDefault();
-    const { socket, message } = this.state;
-    socket.emit("send_msg", message);
+    const { message } = this.state;
+    const { socket } = this.props.socket;
+    this.props.sendMsg(socket, message);
     this.setState({ message: "" });
   };
   render() {
-    const { users, chat, room_id } = this.state;
+    const { chat, room_id, users } = this.props.socket;
     return (
       <Container fluid>
         <Row className="mt-3">
@@ -82,9 +88,10 @@ class Chat extends Component {
               <CardHeader>Room ID: {room_id}</CardHeader>
               <CardBody className="overflow-auto">
                 <ListGroup>
-                  {users.map((user) => (
-                    <ListGroupItem>{user.name}</ListGroupItem>
-                  ))}
+                  {users &&
+                    users.map((user) => (
+                      <ListGroupItem key={user.id}>{user.name}</ListGroupItem>
+                    ))}
                 </ListGroup>
               </CardBody>
             </Card>
@@ -130,4 +137,11 @@ class Chat extends Component {
   }
 }
 
-export default withSocket(withRouter(Chat));
+const mapStateToProps = (state) => ({
+  socket: state.socket,
+});
+
+export default compose(
+  withRouter,
+  connect(mapStateToProps, { sendMsg, recieveMsg, getRoomUsers, leaveRoom })
+)(Chat);

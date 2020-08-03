@@ -37,32 +37,48 @@ io.on("connection", (socket) => {
   socket.on("send_msg", (msg) => {
     const room_id = Object.keys(socket.rooms)[1];
     const user = getUser(room_id, socket.id)[0];
-    console.log(user);
     io.to(room_id).emit("recieve_msg", {
       name: user.name,
       msg,
     });
   });
 
-  socket.on("disconnecting", () => {
-    const room_id = Object.keys(socket.rooms)[1];
-    const user = leaveRoom(room_id, socket.id);
-    if (user) {
-      socket
-        .to(room_id)
-        .emit("recieve_msg", { name: "Bot", msg: `${user[0].name} has left!` });
-    }
+  socket.on("leave_room", () => {
+    leave_room();
   });
 
+  socket.on("disconnecting", () => {
+    leave_room();
+  });
+
+  const leave_room = () => {
+    const room_id = Object.keys(socket.rooms)[1];
+    if (room_id) {
+      socket.leave(room_id);
+      const user = leaveRoom(room_id, socket.id);
+      if (user) {
+        socket.to(room_id).emit("recieve_msg", {
+          name: "Bot",
+          msg: `${user[0].name} has left!`,
+        });
+        const users_in_room = getRoomUsers(room_id);
+        io.to(room_id).emit("room_users", users_in_room);
+        console.log(socket.rooms);
+      }
+    }
+  };
+
   socket.on("check_room_exists", (room_id) => {
-    if (roomExists(room_id)) socket.emit("room_exists");
+    if (roomExists(room_id)) socket.emit("room_exists", room_id);
     else socket.emit("room_no_exist");
   });
 });
 
-app.use(express.static("client/build"));
-app.get("*", (req, res) =>
-  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"))
-);
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("client/build"));
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"))
+  );
+}
 
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`));

@@ -1,4 +1,11 @@
 import React from "react";
+import { connect } from "react-redux";
+import { compose } from "redux";
+import {
+  initializeSocket,
+  createRoom,
+  joinRoom,
+} from "../redux/actions/SocketActions";
 import {
   Form,
   Input,
@@ -14,10 +21,19 @@ import {
   Spinner,
   Alert,
 } from "reactstrap";
+import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
-import { withSocket } from "./SocketContext";
 
 class Home extends React.Component {
+  static propTypes = {
+    socket: PropTypes.object.isRequired,
+  };
+
+  componentDidMount() {
+    const { socket } = this.props.socket;
+    if (!socket) this.props.initializeSocket();
+  }
+
   state = {
     name: "",
     id: "",
@@ -50,13 +66,8 @@ class Home extends React.Component {
     const { name } = this.state;
     if (name !== "") {
       this.onCreateModalToggle();
-      const { socket } = this.props;
-      this.setState({ loading: true });
-      socket.emit("create_room");
-      socket.on("room_id_generated", (id) => {
-        this.setState({ loading: false });
-        this.props.history.push({ pathname: `/room/${id}`, state: { name } });
-      });
+      const { socket } = this.props.socket;
+      this.props.createRoom(socket, name, this.props.history);
     } else {
       this.setState({
         error: "Name cannot be empty",
@@ -66,28 +77,12 @@ class Home extends React.Component {
 
   onJoinRoom = (e) => {
     e.preventDefault();
-    const { socket } = this.props;
     const { name, room_id } = this.state;
     if (name === "" || room_id === "") {
       this.setState({ error: "Please enter all the fields" });
     } else {
-      this.setState({ loading: true });
-      socket.emit("check_room_exists", room_id);
-      socket.on("room_exists", () => {
-        this.onJoinModalToggle();
-        this.setState({ loading: false });
-        this.props.history.push({
-          pathname: `/room/${room_id}`,
-          state: { name },
-        });
-      });
-
-      socket.on("room_no_exist", () => {
-        this.setState({
-          loading: false,
-          error: "The given room ID is invalid or the room doesn't exist",
-        });
-      });
+      const { socket } = this.props.socket;
+      this.props.joinRoom(socket, room_id, name, this.props.history);
     }
   };
 
@@ -200,4 +195,15 @@ class Home extends React.Component {
   }
 }
 
-export default withSocket(withRouter(Home));
+const mapStatetoProps = (state) => ({
+  socket: state.socket,
+});
+
+export default compose(
+  withRouter,
+  connect(mapStatetoProps, {
+    initializeSocket,
+    createRoom,
+    joinRoom,
+  })
+)(Home);

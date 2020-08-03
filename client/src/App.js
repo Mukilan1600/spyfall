@@ -6,14 +6,13 @@ import Chat from "./components/Chatbox";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Home from "./components/Home";
 import CreateRoom from "./components/CreateRoom";
-import SocketContext from "./components/SocketContext";
-import io from "socket.io-client";
+import { Provider } from "react-redux";
+import Store from "./redux/Store";
 
 function App() {
-  const socket = io();
   return (
     <BrowserRouter>
-      <SocketContext.Provider value={socket}>
+      <Provider store={Store}>
         <div className="App">
           <Navbar />
           <Switch>
@@ -22,7 +21,7 @@ function App() {
             <Route path="/" component={Home} />
           </Switch>
         </div>
-      </SocketContext.Provider>
+      </Provider>
     </BrowserRouter>
   );
 }

@@ -18,15 +18,16 @@ const generateNewRoom = () => {
 
 const joinRoom = (room_id, name, user_id) => {
   if (room_id in rooms) rooms[room_id].push(User(name, user_id));
-  console.log(rooms);
 };
 
 const leaveRoom = (room_id, user_id) => {
+  console.log(rooms);
   if (room_id in rooms) {
     const index = rooms[room_id].findIndex((user) => user.id === user_id);
     if (index !== -1) {
       const user = rooms[room_id].splice(index, 1);
       if (rooms[room_id].length < 1) delete rooms[room_id];
+      console.log(rooms);
       return user;
     }
   }
