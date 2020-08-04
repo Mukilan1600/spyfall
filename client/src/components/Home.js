@@ -91,7 +91,7 @@ class Home extends React.Component {
   joinRoomModal = (modalIsOpen, error) => (
     <Modal toggle={this.onJoinModalToggle} isOpen={modalIsOpen} centered>
       <ModalHeader toggle={this.onJoinModalToggle}>Join room</ModalHeader>
-      <Form>
+      <Form onSubmit={this.onJoinRoom}>
         <ModalBody>
           <FormGroup>
             <Label for="name">What's your name?</Label>
@@ -120,7 +120,7 @@ class Home extends React.Component {
           <Button className="mr-2" onClick={this.onJoinModalToggle}>
             Cancel
           </Button>
-          <Button className="ml-2" color="success" onClick={this.onJoinRoom}>
+          <Button className="ml-2" color="success" type="submit">
             Join room
           </Button>
         </ModalFooter>
@@ -131,7 +131,7 @@ class Home extends React.Component {
   createRoomModal = (modalIsOpen, error) => (
     <Modal toggle={this.onCreateModalToggle} isOpen={modalIsOpen} centered>
       <ModalHeader toggle={this.onCreateModalToggle}>Create a room</ModalHeader>
-      <Form>
+      <Form onSubmit={this.onCreateRoom}>
         <ModalBody>
           <FormGroup>
             <Label for="name">What's your name?</Label>
@@ -150,7 +150,7 @@ class Home extends React.Component {
           <Button className="mr-2" onClick={this.onCreateModalToggle}>
             Cancel
           </Button>
-          <Button className="ml-2" color="success" onClick={this.onCreateRoom}>
+          <Button className="ml-2" color="success" type="submit">
             Create room
           </Button>
         </ModalFooter>
