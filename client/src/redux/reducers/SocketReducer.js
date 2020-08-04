@@ -53,6 +53,7 @@ export default function (state = initial_state, action) {
         name: null,
         chat: [],
         users: [],
+        leader: false,
       };
     case RECIEVE_MSG:
       return {
