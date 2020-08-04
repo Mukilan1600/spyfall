@@ -6,6 +6,7 @@ import {
   createRoom,
   joinRoom,
 } from "../redux/actions/SocketActions";
+import { clear_error, get_error } from "../redux/actions/ErrorActions";
 import {
   Form,
   Input,
@@ -27,6 +28,7 @@ import { withRouter } from "react-router-dom";
 class Home extends React.Component {
   static propTypes = {
     socket: PropTypes.object.isRequired,
+    error: PropTypes.object.isRequired,
   };
 
   componentDidMount() {
@@ -44,16 +46,18 @@ class Home extends React.Component {
     error: null,
   };
 
-  onJoinModalToggle = (e) =>
+  onJoinModalToggle = (e) => {
     this.setState({
       joinModal: !this.state.joinModal,
-      error: false,
     });
-  onCreateModalToggle = (e) =>
+    this.props.clear_error();
+  };
+  onCreateModalToggle = (e) => {
     this.setState({
       createModal: !this.state.createModal,
-      error: false,
     });
+    this.props.clear_error();
+  };
 
   onChangeHandler = (e) => {
     this.setState({
@@ -69,9 +73,7 @@ class Home extends React.Component {
       const { socket } = this.props.socket;
       this.props.createRoom(socket, name, this.props.history);
     } else {
-      this.setState({
-        error: "Name cannot be empty",
-      });
+      this.props.get_error("Name cannot be empty");
     }
   };
 
@@ -79,7 +81,7 @@ class Home extends React.Component {
     e.preventDefault();
     const { name, room_id } = this.state;
     if (name === "" || room_id === "") {
-      this.setState({ error: "Please enter all the fields" });
+      this.props.get_error("Please enter all the fields");
     } else {
       const { socket } = this.props.socket;
       this.props.joinRoom(socket, room_id, name, this.props.history);
@@ -157,7 +159,7 @@ class Home extends React.Component {
   );
 
   SpinnerModal = (loading) => (
-    <Modal isOpen={loading}>
+    <Modal isOpen={loading} centered>
       <ModalBody className="text-center">
         <Spinner className="m-4" />
       </ModalBody>
@@ -165,10 +167,12 @@ class Home extends React.Component {
   );
 
   render() {
-    const { loading, joinModal, createModal, error } = this.state;
+    const { joinModal, createModal } = this.state;
+    const { isLoading } = this.props.socket;
+    const { error } = this.props.error;
     return (
       <Container className="mt-3">
-        {this.SpinnerModal(loading)}
+        {this.SpinnerModal(isLoading)}
         {this.joinRoomModal(joinModal, error)}
         {this.createRoomModal(createModal, error)}
         <Jumbotron className="text-center">
@@ -197,6 +201,7 @@ class Home extends React.Component {
 
 const mapStatetoProps = (state) => ({
   socket: state.socket,
+  error: state.error,
 });
 
 export default compose(
@@ -205,5 +210,7 @@ export default compose(
     initializeSocket,
     createRoom,
     joinRoom,
+    clear_error,
+    get_error,
   })
 )(Home);

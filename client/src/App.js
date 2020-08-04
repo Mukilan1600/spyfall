@@ -5,7 +5,6 @@ import Navbar from "./components/Navbar";
 import Chat from "./components/Chatbox";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Home from "./components/Home";
-import CreateRoom from "./components/CreateRoom";
 import { Provider } from "react-redux";
 import Store from "./redux/Store";
 
@@ -17,7 +16,6 @@ function App() {
           <Navbar />
           <Switch>
             <Route path="/room/:id" component={Chat} />
-            <Route path="/createroom" component={CreateRoom} />
             <Route path="/" component={Home} />
           </Switch>
         </div>

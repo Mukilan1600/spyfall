@@ -4,7 +4,12 @@ import {
   LEAVE_ROOM,
   RECIEVE_MSG,
   GET_USERS,
+  IS_LOADING,
+  IS_LOADED,
+  CREATE_ROOM,
 } from "./types";
+import { startGame } from "./GameActions";
+import { get_error } from "./ErrorActions";
 import io from "socket.io-client";
 
 export const initializeSocket = () => {
@@ -16,9 +21,13 @@ export const initializeSocket = () => {
 };
 
 export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
+  dispatch({ type: IS_LOADING });
   socket.emit("check_room_exists", room_id);
   socket.on("room_exists", (id) => {
     socket.emit("join_room", room_id, name);
+    socket.on("game_started", (start_time) => {
+      dispatch(startGame(start_time));
+    });
     dispatch({
       type: JOIN_ROOM,
       payload: {
@@ -26,6 +35,7 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
         name,
       },
     });
+    dispatch({ type: IS_LOADED });
     history.push({
       pathname: `/room/${room_id}`,
       state: {
@@ -34,11 +44,19 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
       },
     });
   });
+  socket.on("room_no_exist", () => {
+    dispatch({ type: IS_LOADED });
+    dispatch(
+      get_error("The given room ID is invalid or the room doesn't exist")
+    );
+  });
 };
 
 export const createRoom = (socket, name, history) => (dispatch) => {
+  dispatch({ type: IS_LOADING });
   socket.emit("create_room");
   socket.on("room_id_generated", (id) => {
+    dispatch({ type: CREATE_ROOM });
     dispatch(joinRoom(socket, id, name, history));
   });
 };
