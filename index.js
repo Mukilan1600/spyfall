@@ -71,8 +71,17 @@ io.on("connection", (socket) => {
 
   socket.on("start_game", () => {
     const room_id = Object.keys(socket.rooms)[1];
-    const time = startGame(room_id, socket.id);
-    if (time) io.to(room_id).emit("game_started", time);
+    const { time, users, spy, location } = startGame(room_id, socket.id);
+    if (time)
+      for (user of users)
+        if (user.id === spy.id)
+          io.to(user.id).emit("game_started", {
+            time,
+            spy: true,
+            location: null,
+          });
+        else
+          io.to(user.id).emit("game_started", { time, spy: false, location });
   });
 });
 

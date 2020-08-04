@@ -1,6 +1,7 @@
 const moment = require("moment");
 
 const rooms = {};
+const location_list = ["Home", "Spa", "Theatre"];
 
 const User = (name, id, leader) => {
   return {
@@ -28,6 +29,9 @@ const generateNewRoom = (user_id) => {
     started: false,
     leader: user_id,
     users: [],
+    spy: null,
+    location: location_list[Math.floor(Math.random() * 3)],
+    votes: {},
   };
   return id;
 };
@@ -72,7 +76,13 @@ const startGame = (room_id, user_id) => {
     if (room.leader === user_id && room.users.length >= 3) {
       room.started = true;
       room.start_time = moment().format("h:mm:ss");
-      return room.start_time;
+      room.spy = room.users[Math.floor(Math.random() * room.users.length)];
+      return {
+        time: room.start_time,
+        users: room.users,
+        spy: room.spy,
+        location: room.location,
+      };
     }
   }
 };

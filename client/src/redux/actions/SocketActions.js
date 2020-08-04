@@ -25,8 +25,8 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
   socket.emit("check_room_exists", room_id);
   socket.on("room_exists", (id) => {
     socket.emit("join_room", room_id, name);
-    socket.on("game_started", (start_time) => {
-      dispatch(startGame(start_time));
+    socket.on("game_started", ({ time, spy, location }) => {
+      dispatch(startGame(time, spy, location));
     });
     dispatch({
       type: JOIN_ROOM,

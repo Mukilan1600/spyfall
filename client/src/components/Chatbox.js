@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { compose } from "redux";
 import PropTypes from "prop-types";
-import moment from "moment";
 import {
   Card,
   Container,
@@ -17,6 +16,7 @@ import {
   CardHeader,
   ListGroup,
   ListGroupItem,
+  Alert,
 } from "reactstrap";
 import Message from "./Message";
 import {
@@ -58,10 +58,16 @@ class Chat extends Component {
     users: [],
     message: "",
     socket: null,
+    rVote: null,
   };
 
-  componentDidUpdate() {
-    this.scrollToBottom();
+  onVoteForUser = (idx) => {
+    this.setState({ rVote: idx });
+  };
+
+  componentDidUpdate(prevProps) {
+    if (this.props.socket.chat.length > prevProps.socket.chat.length)
+      this.scrollToBottom();
   }
 
   componentWillUnmount() {
@@ -89,9 +95,11 @@ class Chat extends Component {
     const { socket } = this.props.socket;
     socket.emit("start_game");
   };
+
   render() {
-    const { chat, room_id, users, leader } = this.props.socket;
-    const { game_started } = this.props.game;
+    const { chat, room_id, users, leader, socket } = this.props.socket;
+    const { game_started, spy, location } = this.props.game;
+    const { rVote } = this.state;
     return (
       <Container fluid>
         <Row className="mt-3 mb-3">
@@ -99,18 +107,49 @@ class Chat extends Component {
             <Card style={{ height: "40vh" }}>
               <CardHeader>Room ID: {room_id}</CardHeader>
               <CardBody className="overflow-auto">
-                <ListGroup>
-                  {users &&
-                    users.map((user) => (
-                      <ListGroupItem key={user.id}>
-                        <FontAwesomeIcon
-                          icon={user.leader ? faStar : faUser}
-                          className="mr-2"
-                        />
-                        {user.name}
-                      </ListGroupItem>
-                    ))}
-                </ListGroup>
+                {game_started && !spy ? (
+                  <React.Fragment>
+                    <p>Vote for who you think is the spy: </p>
+                    {users.map((user, idx) =>
+                      user.id !== socket.id ? (
+                        <Button
+                          block
+                          color="primary"
+                          onClick={this.onVoteForUser.bind(this, idx)}
+                          active={rVote === idx}
+                          key={idx}
+                        >
+                          <FontAwesomeIcon
+                            icon={user.leader ? faStar : faUser}
+                            className="mr-2"
+                          />
+                          {user.name}
+                        </Button>
+                      ) : (
+                        <Button disabled block color="primary" key={idx}>
+                          <FontAwesomeIcon
+                            icon={user.leader ? faStar : faUser}
+                            className="mr-2"
+                          />
+                          {user.name}
+                        </Button>
+                      )
+                    )}
+                  </React.Fragment>
+                ) : (
+                  <ListGroup>
+                    {users &&
+                      users.map((user, idx) => (
+                        <ListGroupItem key={idx}>
+                          <FontAwesomeIcon
+                            icon={user.leader ? faStar : faUser}
+                            className="mr-2"
+                          />
+                          {user.name}
+                        </ListGroupItem>
+                      ))}
+                  </ListGroup>
+                )}
               </CardBody>
               {leader && !game_started && (
                 <CardFooter>
@@ -125,7 +164,15 @@ class Chat extends Component {
               )}
             </Card>
             <Card style={{ height: "40vh" }}>
-              <CardBody>Hello</CardBody>
+              {game_started ? (
+                <CardHeader>
+                  {spy ? "You're the spy" : `You are in ${location}`}
+                </CardHeader>
+              ) : (
+                <CardBody>
+                  <Alert color="info">Waiting for the game to start...</Alert>
+                </CardBody>
+              )}
             </Card>
           </div>
           <div className="col-lg-8">
