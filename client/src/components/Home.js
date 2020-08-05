@@ -89,17 +89,19 @@ class Home extends React.Component {
     }
   };
 
-  popupErrorModal = (modalIsOpen, errorMsg) => (
+  popupErrorModal = (modalIsOpen, error) => (
     <Modal
       isOpen={modalIsOpen}
       toggle={this.onModalToggle.bind(this, "errorModal")}
       centered
     >
       <ModalHeader toggle={this.onModalToggle.bind(this, "errorModal")}>
-        Error
+        {error.error}
       </ModalHeader>
       <ModalBody>
-        <Alert color="danger">{errorMsg}</Alert>
+        <Alert color={error.type === 0 ? "danger" : "success"}>
+          {error.msg}
+        </Alert>
       </ModalBody>
     </Modal>
   );
@@ -213,7 +215,7 @@ class Home extends React.Component {
         {this.SpinnerModal(isLoading)}
         {this.joinRoomModal(joinModal, error)}
         {this.createRoomModal(createModal, error)}
-        {error && this.popupErrorModal(errorModal, error.msg)}
+        {error && this.popupErrorModal(errorModal, error)}
         <Jumbotron className="text-center">
           <p className="display-4">Spyfall</p>
           <Button

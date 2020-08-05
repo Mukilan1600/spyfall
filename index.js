@@ -18,6 +18,7 @@ const {
   Message,
   startGame,
   delete_room,
+  checkSpyGuess,
 } = require("./socket-io");
 
 io.on("connection", (socket) => {
@@ -27,8 +28,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("join_room", (room_id, name, fn) => {
-    const success = joinRoom(room_id, name, socket.id);
-    fn(success);
+    const { success, reason } = joinRoom(room_id, name, socket.id);
+    fn(success, reason);
     if (success) {
       socket.join(room_id);
       socket
@@ -46,6 +47,45 @@ io.on("connection", (socket) => {
     const room_id = Object.keys(socket.rooms)[1];
     const user = getUser(room_id, socket.id)[0];
     io.to(room_id).emit("recieve_msg", Message(user.name, msg));
+  });
+
+  socket.on("spy_guess", (location, room_id) => {
+    const { success, spy, actual_location } = checkSpyGuess(
+      location,
+      room_id,
+      socket.id
+    );
+    if (success) {
+      socket.emit(
+        "game_over",
+        "You won!",
+        `All the agents that were in ${location} has been killed.`,
+        1
+      );
+      socket
+        .to(room_id)
+        .broadcast.emit(
+          "game_over",
+          "Oh no!",
+          `All the agents have been killed by the enemy spy ${spy.name}`,
+          0
+        );
+    } else {
+      socket.emit(
+        "game_over",
+        "Oh No!",
+        `All the agents were in ${actual_location}. You have exposed yourself!`,
+        0
+      );
+      socket
+        .to(room_id)
+        .broadcast.emit(
+          "game_over",
+          "You won!",
+          `The spy had just bombed the ${location} and exposed himself to be ${spy.name}!`,
+          1
+        );
+    }
   });
 
   socket.on("leave_room", () => {
@@ -68,7 +108,7 @@ io.on("connection", (socket) => {
         const users_in_room = getRoomUsers(room_id);
         io.to(room_id).emit("room_users", users_in_room);
         if (end_game) {
-          io.to(room_id).emit("game_over", reason);
+          io.to(room_id).emit("game_over", "Error", reason, 0);
           delete_room(room_id);
         }
       }
@@ -82,7 +122,10 @@ io.on("connection", (socket) => {
 
   socket.on("start_game", () => {
     const room_id = Object.keys(socket.rooms)[1];
-    const { time, users, spy, location } = startGame(room_id, socket.id);
+    const { time, users, spy, location, all_locations } = startGame(
+      room_id,
+      socket.id
+    );
     if (time)
       for (user of users)
         if (user.id === spy.id)
@@ -90,9 +133,15 @@ io.on("connection", (socket) => {
             time,
             spy: true,
             location: null,
+            all_locations,
           });
         else
-          io.to(user.id).emit("game_started", { time, spy: false, location });
+          io.to(user.id).emit("game_started", {
+            time,
+            spy: false,
+            location,
+            all_locations: null,
+          });
   });
 });
 

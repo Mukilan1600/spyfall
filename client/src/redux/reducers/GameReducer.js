@@ -6,6 +6,7 @@ const initialState = {
   start_time: null,
   spy: false,
   location: null,
+  all_locations: null,
 };
 
 export default function (state = initialState, action) {

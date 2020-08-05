@@ -1,7 +1,33 @@
 const moment = require("moment");
 
 const rooms = {};
-const location_list = ["Home", "Spa", "Theatre"];
+const location_list = [
+  "Cruise Ship",
+  "5-Start Hotel",
+  "Local restaurant",
+  "Police station",
+  "Mall",
+  "Beach",
+  "Water park",
+  "Movie studio",
+  "Theater",
+  "Library",
+  "University",
+  "School",
+  "Gas station",
+  "Day spa",
+  "Casino",
+  "Park",
+  "Grocery store",
+  "Bank",
+  "Airport",
+  "Military base",
+  "Antartica",
+  "Sahara desert",
+  "Amazon rain forest",
+  "Space station",
+  "Mars",
+];
 
 const User = (name, id, leader) => {
   return {
@@ -34,7 +60,7 @@ const generateNewRoom = (user_id) => {
     leader: user_id,
     users: [],
     spy: null,
-    location: location_list[Math.floor(Math.random() * 3)],
+    location: location_list[Math.floor(Math.random() * location_list.length)],
     votes: {},
   };
   return id;
@@ -42,10 +68,24 @@ const generateNewRoom = (user_id) => {
 
 const joinRoom = (room_id, name, user_id) => {
   if (room_id in rooms) {
-    if (rooms[room_id].started) return false;
+    if (rooms[room_id].started)
+      return { success: false, reason: "The game has already started" };
+    const exists = rooms[room_id].users.findIndex((user) => user.name === name);
+    if (exists !== -1)
+      return { success: false, reason: "The name is already taken" };
     const leader = rooms[room_id].leader === user_id;
     rooms[room_id].users.push(User(name, user_id, leader));
-    return true;
+    return { success: true, reason: null };
+  }
+};
+
+const checkSpyGuess = (location, room_id, user_id) => {
+  const room = rooms[room_id];
+  if (room && room.spy.id === user_id) {
+    if (room.location === location)
+      return { success: true, spy: room.spy, actual_location: room.location };
+    else
+      return { success: false, spy: room.spy, actual_location: room.location };
   }
 };
 
@@ -59,7 +99,7 @@ const leaveRoom = (room_id, user_id) => {
       if (user_id === rooms[room_id].leader) {
         end_game = true;
         reason = "The leader has left the game";
-      } else if (user_id === rooms[room_id].spy) {
+      } else if (user_id === rooms[room_id].spy.id) {
         end_game = true;
         reason = "The spy has left the game";
       } else if (rooms[room_id].users.length < 3 && rooms[room_id].started) {
@@ -100,6 +140,7 @@ const startGame = (room_id, user_id) => {
         users: room.users,
         spy: room.spy,
         location: room.location,
+        all_locations: location_list,
       };
     }
   }
@@ -115,4 +156,5 @@ module.exports = {
   Message,
   startGame,
   delete_room,
+  checkSpyGuess,
 };

@@ -50,6 +50,7 @@ class Chat extends Component {
     message: "",
     socket: null,
     rVote: null,
+    spy_guess: null,
   };
 
   onVoteForUser = (idx) => {
@@ -89,9 +90,16 @@ class Chat extends Component {
     socket.emit("start_game");
   };
 
+  onSpyGuess = () => {
+    const { socket, room_id } = this.props.socket;
+    const { spy_guess } = this.state;
+    if (spy_guess && spy_guess !== "")
+      socket.emit("spy_guess", spy_guess, room_id);
+  };
+
   render() {
     const { chat, room_id, users, leader, socket } = this.props.socket;
-    const { game_started, spy, location } = this.props.game;
+    const { game_started, spy, location, all_locations } = this.props.game;
     const { rVote } = this.state;
     return (
       <Container fluid>
@@ -158,9 +166,38 @@ class Chat extends Component {
             </Card>
             <Card style={{ height: "40vh" }}>
               {game_started ? (
-                <CardHeader>
-                  {spy ? "You're the spy" : `You are in ${location}`}
-                </CardHeader>
+                <React.Fragment>
+                  <CardHeader>
+                    {spy ? "You're the spy" : `You are in ${location}`}
+                  </CardHeader>
+                  {game_started && spy && (
+                    <CardBody>
+                      <p>Where do you think the others are?</p>
+                      <Input
+                        type="select"
+                        name="spy_guess"
+                        onChange={this.onChangeHandler}
+                      >
+                        <option disabled hidden selected value="">
+                          Select a location
+                        </option>
+                        {all_locations.map((location, idx) => (
+                          <option key={idx} value={location}>
+                            {location}
+                          </option>
+                        ))}
+                      </Input>
+                      <Button
+                        color="danger"
+                        className="mt-2"
+                        onClick={this.onSpyGuess}
+                        block
+                      >
+                        Bomb it!
+                      </Button>
+                    </CardBody>
+                  )}
+                </React.Fragment>
               ) : (
                 <CardBody>
                   <Alert color="info">Waiting for the game to start...</Alert>

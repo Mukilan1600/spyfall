@@ -25,22 +25,25 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
   socket.emit("check_room_exists", room_id, (exists, room_id) => {
     dispatch({ type: IS_LOADED });
     if (exists) {
-      socket.emit("join_room", room_id, name, (success) => {
+      socket.emit("join_room", room_id, name, (success, reason) => {
         if (success) {
           socket.on("recieve_msg", (msg) => {
             dispatch(recieveMsg(msg));
           });
 
-          socket.on("game_over", (reason) => {
+          socket.on("game_over", (error, reason, type) => {
             dispatch(clear_room_details());
-            if (reason) dispatch(get_error(reason, 1));
+            if (reason) dispatch(get_error(reason, error, type, 1));
           });
           socket.on("room_users", (users) => {
             dispatch(getRoomUsers(users));
           });
-          socket.on("game_started", ({ time, spy, location }) => {
-            dispatch(startGame(time, spy, location));
-          });
+          socket.on(
+            "game_started",
+            ({ time, spy, location, all_locations }) => {
+              dispatch(startGame(time, spy, location, all_locations));
+            }
+          );
           dispatch({
             type: JOIN_ROOM,
             payload: {
@@ -56,7 +59,7 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
             },
           });
         } else {
-          dispatch(get_error("The game has already started"));
+          dispatch(get_error(reason));
         }
       });
     } else {
