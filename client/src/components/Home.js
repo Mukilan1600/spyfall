@@ -42,19 +42,20 @@ class Home extends React.Component {
     room_id: "",
     createModal: false,
     joinModal: false,
+    errorModal: false,
     loading: null,
     error: null,
   };
 
-  onJoinModalToggle = (e) => {
+  componentDidUpdate() {
+    const { error } = this.props.error;
+    const { errorModal } = this.state;
+    if (error && error.priority === 1 && !errorModal)
+      this.setState({ errorModal: true });
+  }
+  onModalToggle = (id) => {
     this.setState({
-      joinModal: !this.state.joinModal,
-    });
-    this.props.clear_error();
-  };
-  onCreateModalToggle = (e) => {
-    this.setState({
-      createModal: !this.state.createModal,
+      [id]: !this.state[id],
     });
     this.props.clear_error();
   };
@@ -69,7 +70,7 @@ class Home extends React.Component {
     e.preventDefault();
     const { name } = this.state;
     if (name !== "") {
-      this.onCreateModalToggle();
+      this.onModalToggle("createModal");
       const { socket } = this.props.socket;
       this.props.createRoom(socket, name, this.props.history);
     } else {
@@ -88,9 +89,30 @@ class Home extends React.Component {
     }
   };
 
+  popupErrorModal = (modalIsOpen, errorMsg) => (
+    <Modal
+      isOpen={modalIsOpen}
+      toggle={this.onModalToggle.bind(this, "errorModal")}
+      centered
+    >
+      <ModalHeader toggle={this.onModalToggle.bind(this, "errorModal")}>
+        Error
+      </ModalHeader>
+      <ModalBody>
+        <Alert color="danger">{errorMsg}</Alert>
+      </ModalBody>
+    </Modal>
+  );
+
   joinRoomModal = (modalIsOpen, error) => (
-    <Modal toggle={this.onJoinModalToggle} isOpen={modalIsOpen} centered>
-      <ModalHeader toggle={this.onJoinModalToggle}>Join room</ModalHeader>
+    <Modal
+      toggle={this.onModalToggle.bind(this, "joinModal")}
+      isOpen={modalIsOpen}
+      centered
+    >
+      <ModalHeader toggle={this.onModalToggle.bind(this, "joinModal")}>
+        Join room
+      </ModalHeader>
       <Form onSubmit={this.onJoinRoom}>
         <ModalBody>
           <FormGroup>
@@ -114,10 +136,15 @@ class Home extends React.Component {
               onChange={this.onChangeHandler}
             />
           </FormGroup>
-          {error && <Alert color="danger">{error}</Alert>}
+          {error && error.priority === 0 && (
+            <Alert color="danger">{error.msg}</Alert>
+          )}
         </ModalBody>
         <ModalFooter>
-          <Button className="mr-2" onClick={this.onJoinModalToggle}>
+          <Button
+            className="mr-2"
+            onClick={this.onModalToggle.bind(this, "joinModal")}
+          >
             Cancel
           </Button>
           <Button className="ml-2" color="success" type="submit">
@@ -129,8 +156,14 @@ class Home extends React.Component {
   );
 
   createRoomModal = (modalIsOpen, error) => (
-    <Modal toggle={this.onCreateModalToggle} isOpen={modalIsOpen} centered>
-      <ModalHeader toggle={this.onCreateModalToggle}>Create a room</ModalHeader>
+    <Modal
+      toggle={this.onModalToggle.bind(this, "createModal")}
+      isOpen={modalIsOpen}
+      centered
+    >
+      <ModalHeader toggle={this.onModalToggle.bind(this, "createModal")}>
+        Create a room
+      </ModalHeader>
       <Form onSubmit={this.onCreateRoom}>
         <ModalBody>
           <FormGroup>
@@ -144,10 +177,15 @@ class Home extends React.Component {
               autoFocus
             />
           </FormGroup>
-          {error && <Alert color="danger">{error}</Alert>}
+          {error && error.priority === 0 && (
+            <Alert color="danger">{error.msg}</Alert>
+          )}
         </ModalBody>
         <ModalFooter>
-          <Button className="mr-2" onClick={this.onCreateModalToggle}>
+          <Button
+            className="mr-2"
+            onClick={this.onModalToggle.bind(this, "createModal")}
+          >
             Cancel
           </Button>
           <Button className="ml-2" color="success" type="submit">
@@ -167,7 +205,7 @@ class Home extends React.Component {
   );
 
   render() {
-    const { joinModal, createModal } = this.state;
+    const { joinModal, createModal, errorModal } = this.state;
     const { isLoading } = this.props.socket;
     const { error } = this.props.error;
     return (
@@ -175,13 +213,14 @@ class Home extends React.Component {
         {this.SpinnerModal(isLoading)}
         {this.joinRoomModal(joinModal, error)}
         {this.createRoomModal(createModal, error)}
+        {error && this.popupErrorModal(errorModal, error.msg)}
         <Jumbotron className="text-center">
           <p className="display-4">Spyfall</p>
           <Button
             className="m-2"
             color="primary"
             name="createModal"
-            onClick={this.onCreateModalToggle}
+            onClick={this.onModalToggle.bind(this, "createModal")}
           >
             Create a room
           </Button>
@@ -189,7 +228,7 @@ class Home extends React.Component {
             className="m-2"
             color="success"
             name="joinModal"
-            onClick={this.onJoinModalToggle}
+            onClick={this.onModalToggle.bind(this, "joinModal")}
           >
             Join a room
           </Button>

@@ -43,15 +43,6 @@ class Chat extends Component {
   componentDidMount() {
     const { socket, room_id, name } = this.props.socket;
     if (!socket || !room_id || !name) this.props.history.push("/");
-    else {
-      socket.on("recieve_msg", (msg) => {
-        this.props.recieveMsg(msg);
-      });
-
-      socket.on("room_users", (users) => {
-        this.props.getRoomUsers(users);
-      });
-    }
   }
 
   state = {
@@ -68,6 +59,8 @@ class Chat extends Component {
   componentDidUpdate(prevProps) {
     if (this.props.socket.chat.length > prevProps.socket.chat.length)
       this.scrollToBottom();
+    const { room_id } = this.props.socket;
+    if (!room_id) this.props.history.push("/");
   }
 
   componentWillUnmount() {

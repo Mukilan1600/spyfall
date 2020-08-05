@@ -17,22 +17,29 @@ const {
   getRoomUsers,
   Message,
   startGame,
+  delete_room,
 } = require("./socket-io");
 
 io.on("connection", (socket) => {
-  socket.on("create_room", () => {
+  socket.on("create_room", (fn) => {
     const new_room_id = generateNewRoom(socket.id);
-    socket.emit("room_id_generated", new_room_id);
+    fn(new_room_id);
   });
 
-  socket.on("join_room", (room_id, name) => {
-    joinRoom(room_id, name, socket.id);
-    socket.join(room_id);
-    socket
-      .to(room_id)
-      .broadcast.emit("recieve_msg", Message("Bot", `${name} has connected!`));
-    const users_in_room = getRoomUsers(room_id);
-    io.to(room_id).emit("room_users", users_in_room);
+  socket.on("join_room", (room_id, name, fn) => {
+    const success = joinRoom(room_id, name, socket.id);
+    fn(success);
+    if (success) {
+      socket.join(room_id);
+      socket
+        .to(room_id)
+        .broadcast.emit(
+          "recieve_msg",
+          Message("Bot", `${name} has connected!`)
+        );
+      const users_in_room = getRoomUsers(room_id);
+      io.to(room_id).emit("room_users", users_in_room);
+    }
   });
 
   socket.on("send_msg", (msg) => {
@@ -53,20 +60,24 @@ io.on("connection", (socket) => {
     const room_id = Object.keys(socket.rooms)[1];
     if (room_id) {
       socket.leave(room_id);
-      const user = leaveRoom(room_id, socket.id);
+      const { user, end_game, reason } = leaveRoom(room_id, socket.id);
       if (user) {
         socket
           .to(room_id)
           .emit("recieve_msg", Message("Bot", `${user[0].name} has left!`));
         const users_in_room = getRoomUsers(room_id);
         io.to(room_id).emit("room_users", users_in_room);
+        if (end_game) {
+          io.to(room_id).emit("game_over", reason);
+          delete_room(room_id);
+        }
       }
     }
   };
 
-  socket.on("check_room_exists", (room_id) => {
-    if (roomExists(room_id)) socket.emit("room_exists", room_id);
-    else socket.emit("room_no_exist");
+  socket.on("check_room_exists", (room_id, fn) => {
+    if (roomExists(room_id)) fn(true, room_id);
+    else fn(false);
   });
 
   socket.on("start_game", () => {
@@ -85,11 +96,9 @@ io.on("connection", (socket) => {
   });
 });
 
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static("client/build"));
-  app.get("*", (req, res) =>
-    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"))
-  );
-}
+app.use(express.static(path.resolve(__dirname, "client", "build")));
+app.get("*", (req, res) =>
+  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"))
+);
 
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`));

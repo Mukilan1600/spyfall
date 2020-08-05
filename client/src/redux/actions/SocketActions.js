@@ -22,51 +22,67 @@ export const initializeSocket = () => {
 
 export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
   dispatch({ type: IS_LOADING });
-  socket.emit("check_room_exists", room_id);
-  socket.on("room_exists", (id) => {
-    socket.emit("join_room", room_id, name);
-    socket.on("game_started", ({ time, spy, location }) => {
-      dispatch(startGame(time, spy, location));
-    });
-    dispatch({
-      type: JOIN_ROOM,
-      payload: {
-        room_id,
-        name,
-      },
-    });
+  socket.emit("check_room_exists", room_id, (exists, room_id) => {
     dispatch({ type: IS_LOADED });
-    history.push({
-      pathname: `/room/${room_id}`,
-      state: {
-        room_id,
-        name,
-      },
-    });
-  });
-  socket.on("room_no_exist", () => {
-    dispatch({ type: IS_LOADED });
-    dispatch(
-      get_error("The given room ID is invalid or the room doesn't exist")
-    );
+    if (exists) {
+      socket.emit("join_room", room_id, name, (success) => {
+        if (success) {
+          socket.on("recieve_msg", (msg) => {
+            dispatch(recieveMsg(msg));
+          });
+
+          socket.on("game_over", (reason) => {
+            dispatch(clear_room_details());
+            if (reason) dispatch(get_error(reason, 1));
+          });
+          socket.on("room_users", (users) => {
+            dispatch(getRoomUsers(users));
+          });
+          socket.on("game_started", ({ time, spy, location }) => {
+            dispatch(startGame(time, spy, location));
+          });
+          dispatch({
+            type: JOIN_ROOM,
+            payload: {
+              room_id,
+              name,
+            },
+          });
+          history.push({
+            pathname: `/room/${room_id}`,
+            state: {
+              room_id,
+              name,
+            },
+          });
+        } else {
+          dispatch(get_error("The game has already started"));
+        }
+      });
+    } else {
+      dispatch(
+        get_error("The given room ID is invalid or the room doesn't exist")
+      );
+    }
   });
 };
 
 export const createRoom = (socket, name, history) => (dispatch) => {
   dispatch({ type: IS_LOADING });
-  socket.emit("create_room");
-  socket.on("room_id_generated", (id) => {
+  socket.emit("create_room", (room_id) => {
     dispatch({ type: CREATE_ROOM });
-    dispatch(joinRoom(socket, id, name, history));
+    dispatch(joinRoom(socket, room_id, name, history));
   });
 };
 
 export const leaveRoom = (socket) => (dispatch) => {
-  if (socket.hasListeners("room_exists")) socket.removeListener("room_exists");
   socket.emit("leave_room");
-  dispatch({
+};
+
+export const clear_room_details = () => {
+  return {
     type: LEAVE_ROOM,
-  });
+  };
 };
 
 export const sendMsg = (socket, msg) => (dispatch) => {

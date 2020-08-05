@@ -1,9 +1,9 @@
 import { GET_ERROR, CLEAR_ERROR } from "./types";
 
-export const get_error = (err) => {
+export const get_error = (msg, priority = 0) => {
   return {
     type: GET_ERROR,
-    payload: err,
+    payload: { msg, priority },
   };
 };
 
