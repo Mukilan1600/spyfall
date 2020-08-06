@@ -8,7 +8,7 @@ import {
   IS_LOADED,
   CREATE_ROOM,
 } from "./types";
-import { startGame } from "./GameActions";
+import { startGame, getCurrQues } from "./GameActions";
 import { get_error } from "./ErrorActions";
 import io from "socket.io-client";
 
@@ -27,6 +27,9 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
     if (exists) {
       socket.emit("join_room", room_id, name, (success, reason) => {
         if (success) {
+          socket.on("ques_pair", (currQues) => {
+            dispatch(getCurrQues(currQues));
+          });
           socket.on("recieve_msg", (msg) => {
             dispatch(recieveMsg(msg));
           });
@@ -40,8 +43,8 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
           });
           socket.on(
             "game_started",
-            ({ time, spy, location, all_locations }) => {
-              dispatch(startGame(time, spy, location, all_locations));
+            ({ time, spy, location, all_locations, currQues }) => {
+              dispatch(startGame(time, spy, location, all_locations, currQues));
             }
           );
           dispatch({

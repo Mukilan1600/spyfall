@@ -1,5 +1,6 @@
-import { START_GAME, LEAVE_GAME } from "../actions/types";
+import { START_GAME, LEAVE_GAME, CURR_QUES } from "../actions/types";
 import moment from "moment";
+import { startGame } from "../actions/GameActions";
 
 const initialState = {
   game_started: false,
@@ -7,10 +8,16 @@ const initialState = {
   spy: false,
   location: null,
   all_locations: null,
+  currQues: null,
 };
 
 export default function (state = initialState, action) {
   switch (action.type) {
+    case CURR_QUES:
+      return {
+        ...state,
+        currQues: action.payload,
+      };
     case START_GAME:
       return {
         ...state,

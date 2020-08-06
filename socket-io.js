@@ -62,6 +62,7 @@ const generateNewRoom = (user_id) => {
     spy: null,
     location: location_list[Math.floor(Math.random() * location_list.length)],
     votes: {},
+    currQues: [],
   };
   return id;
 };
@@ -96,15 +97,17 @@ const leaveRoom = (room_id, user_id) => {
       const user = rooms[room_id].users.splice(index, 1);
       var end_game = false,
         reason = "";
-      if (user_id === rooms[room_id].leader) {
-        end_game = true;
-        reason = "The leader has left the game";
-      } else if (user_id === rooms[room_id].spy.id) {
-        end_game = true;
-        reason = "The spy has left the game";
-      } else if (rooms[room_id].users.length < 3 && rooms[room_id].started) {
-        end_game = true;
-        reason = "There is not enough people to continue the game";
+      if (rooms[room_id].started) {
+        if (user_id === rooms[room_id].leader) {
+          end_game = true;
+          reason = "The leader has left the game";
+        } else if (user_id === rooms[room_id].spy.id) {
+          end_game = true;
+          reason = "The spy has left the game";
+        } else if (rooms[room_id].users.length < 3 && rooms[room_id].started) {
+          end_game = true;
+          reason = "There is not enough people to continue the game";
+        }
       }
       if (rooms[room_id].length < 1) delete rooms[room_id];
       return { user, end_game, reason };
@@ -135,15 +138,38 @@ const startGame = (room_id, user_id) => {
       room.started = true;
       room.start_time = moment().format("h:mm:ss");
       room.spy = room.users[Math.floor(Math.random() * room.users.length)];
+      var user1 = room.users[Math.floor(Math.random() * room.users.length)],
+        user2 = room.users[Math.floor(Math.random() * room.users.length)];
+      while (user1 === user2)
+        user1 = room.users[Math.floor(Math.random() * room.users.length)];
+      room.currQues = [user1, user2];
       return {
         time: room.start_time,
         users: room.users,
         spy: room.spy,
         location: room.location,
         all_locations: location_list,
+        currQues: room.currQues,
       };
     }
   }
+};
+
+const getQuesPair = (room_id) => {
+  if (!rooms[room_id]) return null;
+  const { users, currQues } = rooms[room_id];
+  var user1 = users[Math.floor(Math.random() * users.length)],
+    user2 = users[Math.floor(Math.random() * users.length)];
+  while (
+    user1.id === user2.id ||
+    currQues[0].id === user1.id ||
+    currQues[1].id === user2.id
+  ) {
+    user1 = users[Math.floor(Math.random() * users.length)];
+    user2 = users[Math.floor(Math.random() * users.length)];
+  }
+  rooms[room_id].currQues = [user1, user2];
+  return [user1, user2];
 };
 
 module.exports = {
@@ -157,4 +183,5 @@ module.exports = {
   startGame,
   delete_room,
   checkSpyGuess,
+  getQuesPair,
 };

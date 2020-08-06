@@ -10,3 +10,4 @@ export const IS_LOADING = "IS_LOADING";
 export const IS_LOADED = "IS_LOADED";
 export const START_GAME = "START_GAME";
 export const LEAVE_GAME = "LEAVE_GAME";
+export const CURR_QUES = "CURR_QUES";

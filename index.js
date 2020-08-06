@@ -19,6 +19,7 @@ const {
   startGame,
   delete_room,
   checkSpyGuess,
+  getQuesPair,
 } = require("./socket-io");
 
 io.on("connection", (socket) => {
@@ -120,9 +121,14 @@ io.on("connection", (socket) => {
     else fn(false);
   });
 
+  socket.on("next_ques", (room_id) => {
+    const currQues = getQuesPair(room_id);
+    io.to(room_id).emit("ques_pair", currQues);
+  });
+
   socket.on("start_game", () => {
     const room_id = Object.keys(socket.rooms)[1];
-    const { time, users, spy, location, all_locations } = startGame(
+    const { time, users, spy, location, all_locations, currQues } = startGame(
       room_id,
       socket.id
     );
@@ -134,6 +140,7 @@ io.on("connection", (socket) => {
             spy: true,
             location: null,
             all_locations,
+            currQues,
           });
         else
           io.to(user.id).emit("game_started", {
@@ -141,6 +148,7 @@ io.on("connection", (socket) => {
             spy: false,
             location,
             all_locations: null,
+            currQues,
           });
   });
 });

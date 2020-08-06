@@ -51,21 +51,44 @@ class Chat extends Component {
     socket: null,
     rVote: null,
     spy_guess: null,
+    nextQuesTimer: null,
   };
 
   onVoteForUser = (idx) => {
     this.setState({ rVote: idx });
   };
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     if (this.props.socket.chat.length > prevProps.socket.chat.length)
       this.scrollToBottom();
-    const { room_id } = this.props.socket;
+    const { room_id, socket } = this.props.socket;
+    const { currQues } = this.props.game;
+    const prevQues = prevProps.game.currQues;
+    if (currQues) {
+      if (currQues[0].id === socket.id) {
+        if (!prevQues)
+          this.setState({
+            nextQuesTimer: setTimeout(() => this.getNextQues(), 60 * 1000),
+          });
+        else if (prevQues[0].id !== currQues[0].id)
+          this.setState({
+            nextQuesTimer: setTimeout(() => this.getNextQues(), 60 * 1000),
+          });
+      }
+    }
+    console.log(prevProps);
     if (!room_id) this.props.history.push("/");
   }
 
+  getNextQues = () => {
+    const { socket, room_id } = this.props.socket;
+    socket.emit("next_ques", room_id);
+  };
+
   componentWillUnmount() {
     const { socket } = this.props.socket;
+    const { nextQuesTimer } = this.state;
+    if (nextQuesTimer) clearTimeout(nextQuesTimer);
     if (socket) {
       socket.removeAllListeners();
       this.props.leaveRoom(socket);
@@ -99,7 +122,13 @@ class Chat extends Component {
 
   render() {
     const { chat, room_id, users, leader, socket } = this.props.socket;
-    const { game_started, spy, location, all_locations } = this.props.game;
+    const {
+      game_started,
+      spy,
+      location,
+      all_locations,
+      currQues,
+    } = this.props.game;
     const { rVote } = this.state;
     return (
       <Container fluid>
@@ -170,33 +199,60 @@ class Chat extends Component {
                   <CardHeader>
                     {spy ? "You're the spy" : `You are in ${location}`}
                   </CardHeader>
-                  {game_started && spy && (
-                    <CardBody>
-                      <p>Where do you think the others are?</p>
-                      <Input
-                        type="select"
-                        name="spy_guess"
-                        onChange={this.onChangeHandler}
-                      >
-                        <option disabled hidden selected value="">
-                          Select a location
-                        </option>
-                        {all_locations.map((location, idx) => (
-                          <option key={idx} value={location}>
-                            {location}
-                          </option>
-                        ))}
-                      </Input>
-                      <Button
-                        color="danger"
-                        className="mt-2"
-                        onClick={this.onSpyGuess}
-                        block
-                      >
-                        Bomb it!
-                      </Button>
-                    </CardBody>
-                  )}
+                  <CardBody className="overflow-auto">
+                    {game_started && (
+                      <React.Fragment>
+                        {spy && (
+                          <React.Fragment>
+                            <p>Where do you think the others are?</p>
+                            <Input
+                              type="select"
+                              name="spy_guess"
+                              onChange={this.onChangeHandler}
+                            >
+                              <option disabled hidden selected value="">
+                                Select a location
+                              </option>
+                              {all_locations.map((location, idx) => (
+                                <option key={idx} value={location}>
+                                  {location}
+                                </option>
+                              ))}
+                            </Input>
+                            <Button
+                              color="danger"
+                              className="m-2"
+                              onClick={this.onSpyGuess}
+                              block
+                            >
+                              Bomb it!
+                            </Button>
+                          </React.Fragment>
+                        )}
+                        {currQues[0].id === socket.id ? (
+                          <Alert color="info">
+                            <span>You have to question {currQues[1].name}</span>
+                            <Button
+                              className="ml-2"
+                              size="sm"
+                              color="success"
+                              onClick={this.getNextQues}
+                            >
+                              Done!
+                            </Button>
+                          </Alert>
+                        ) : currQues[1].id === socket.id ? (
+                          <Alert color="info">
+                            You have to answer {currQues[0].name}'s questions
+                          </Alert>
+                        ) : (
+                          <Alert color="info">
+                            {currQues[0].name} is questioning {currQues[1].name}
+                          </Alert>
+                        )}
+                      </React.Fragment>
+                    )}
+                  </CardBody>
                 </React.Fragment>
               ) : (
                 <CardBody>
