@@ -123,7 +123,7 @@ io.on("connection", (socket) => {
 
   socket.on("next_ques", (room_id) => {
     const currQues = getQuesPair(room_id);
-    io.to(room_id).emit("ques_pair", currQues);
+    if (currQues) io.to(room_id).emit("ques_pair", currQues);
   });
 
   socket.on("start_game", () => {

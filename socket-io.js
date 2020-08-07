@@ -155,8 +155,9 @@ const startGame = (room_id, user_id) => {
   }
 };
 
-const getQuesPair = (room_id) => {
+const getQuesPair = (room_id, user_id) => {
   if (!rooms[room_id]) return null;
+  if (rooms[room_id].currQues[0].id === user_id) return null;
   const { users, currQues } = rooms[room_id];
   var user1 = users[Math.floor(Math.random() * users.length)],
     user2 = users[Math.floor(Math.random() * users.length)];

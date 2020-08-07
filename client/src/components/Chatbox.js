@@ -82,6 +82,11 @@ class Chat extends Component {
 
   getNextQues = () => {
     const { socket, room_id } = this.props.socket;
+    const { nextQuesTimer } = this.state;
+    if (nextQuesTimer) {
+      clearTimeout(nextQuesTimer);
+      this.setState({ nextQuesTimer: null });
+    }
     socket.emit("next_ques", room_id);
   };
 

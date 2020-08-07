@@ -1,6 +1,5 @@
 import { START_GAME, LEAVE_GAME, CURR_QUES } from "../actions/types";
 import moment from "moment";
-import { startGame } from "../actions/GameActions";
 
 const initialState = {
   game_started: false,
