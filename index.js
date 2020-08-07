@@ -1,6 +1,8 @@
 const http = require("http");
 const express = require("express");
 const path = require("path");
+const helmet = require("helmet");
+const rateLimit = require("express-rate-limit");
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -152,6 +154,8 @@ io.on("connection", (socket) => {
           });
   });
 });
+
+app.use(helmet());
 
 app.use(express.static(path.resolve(__dirname, "client", "build")));
 app.get("*", (req, res) =>

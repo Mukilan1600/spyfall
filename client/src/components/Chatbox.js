@@ -76,7 +76,6 @@ class Chat extends Component {
           });
       }
     }
-    console.log(prevProps);
     if (!room_id) this.props.history.push("/");
   }
 
