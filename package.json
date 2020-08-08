@@ -8,7 +8,7 @@
     "dev-server": "nodemon index.js",
     "dev-client": "npm start --prefix client",
     "dev": "concurrently \"npm run dev-server\" \"npm run dev-client\"",
-    "heroku-postbuild": "NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+    "heroku-postbuild": "INLINE_RUNTIME_CHUNK=false NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
   },
   "author": "Mukilan IK",
   "license": "ISC",
