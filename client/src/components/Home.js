@@ -211,12 +211,12 @@ class Home extends React.Component {
     const { isLoading } = this.props.socket;
     const { error } = this.props.error;
     return (
-      <Container className="mt-3">
+      <Container className="vertical-center">
         {this.SpinnerModal(isLoading)}
         {this.joinRoomModal(joinModal, error)}
         {this.createRoomModal(createModal, error)}
         {error && this.popupErrorModal(errorModal, error)}
-        <Jumbotron className="text-center">
+        <Jumbotron className="text-center mx-auto">
           <p className="display-4">Spyfall</p>
           <Button
             className="m-2"
