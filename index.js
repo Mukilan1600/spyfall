@@ -2,7 +2,6 @@ const http = require("http");
 const express = require("express");
 const path = require("path");
 const helmet = require("helmet");
-const rateLimit = require("express-rate-limit");
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -11,6 +10,7 @@ const server = http.createServer(app);
 const socketio = require("socket.io");
 const io = socketio(server);
 const {
+  endRound,
   generateNewRoom,
   joinRoom,
   leaveRoom,
@@ -22,6 +22,9 @@ const {
   delete_room,
   checkSpyGuess,
   getQuesPair,
+  onNextRoundVote,
+  isSpy,
+  voteForSpy,
 } = require("./socket-io");
 
 io.on("connection", (socket) => {
@@ -126,6 +129,80 @@ io.on("connection", (socket) => {
   socket.on("next_ques", (room_id) => {
     const currQues = getQuesPair(room_id);
     if (currQues) io.to(room_id).emit("ques_pair", currQues);
+  });
+
+  socket.on("next_round_vote", (room_id) => {
+    onNextRoundVote(room_id);
+  });
+
+  socket.on("spy_vote", (room_id, user_id) => {
+    voteForSpy(room_id, user_id, socket.id);
+  });
+
+  socket.on("end_round", (room_id) => {
+    if (isSpy(room_id, socket.id)) {
+      const { end_game, round, spy_won, max_voted_user, spy } = endRound(
+        room_id
+      );
+      if (end_game) {
+        const users = getRoomUsers(room_id);
+        if (spy_won) {
+          if (max_voted_user) {
+            users.map((user) => {
+              if (user.id === spy.id)
+                io.to(user.id).emit(
+                  "game_over",
+                  "You Won!",
+                  `Majority of the people voted for ${max_voted_user.name}`,
+                  1
+                );
+              else
+                io.to(user.id).emit(
+                  "game_over",
+                  "Oh No!",
+                  `Majority of the people voted for ${max_voted_user.name}, ${spy.name} was the real spy`,
+                  0
+                );
+            });
+          } else {
+            users.map((user) => {
+              if (user.id === spy.id)
+                io.to(user.id).emit(
+                  "game_over",
+                  "You Won!",
+                  `None of the people voted for you`,
+                  1
+                );
+              else
+                io.to(user.id).emit(
+                  "game_over",
+                  "Oh No!",
+                  `None voted for the real spy ${spy.name}`,
+                  0
+                );
+            });
+          }
+        } else {
+          users.map((user) => {
+            if (user.id === spy.id)
+              io.to(user.id).emit(
+                "game_over",
+                "Oh No!",
+                `Majority of the agents voted for you and you have been exposed`,
+                0
+              );
+            else
+              io.to(user.id).emit(
+                "game_over",
+                "You Won!",
+                `Majority of the agents voted for the real spy ${spy.name}`,
+                1
+              );
+          });
+        }
+      }
+      if (!end_game) io.to(room_id).emit("start_next_round", round);
+    }
   });
 
   socket.on("start_game", () => {

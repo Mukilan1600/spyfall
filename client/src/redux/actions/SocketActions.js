@@ -8,7 +8,7 @@ import {
   IS_LOADED,
   CREATE_ROOM,
 } from "./types";
-import { startGame, getCurrQues } from "./GameActions";
+import { startGame, getCurrQues, startNextRound } from "./GameActions";
 import { get_error } from "./ErrorActions";
 import io from "socket.io-client";
 
@@ -44,6 +44,9 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
           socket.on(
             "game_started",
             ({ time, spy, location, all_locations, currQues }) => {
+              socket.on("start_next_round", (round) => {
+                dispatch(startNextRound(round));
+              });
               dispatch(startGame(time, spy, location, all_locations, currQues));
             }
           );

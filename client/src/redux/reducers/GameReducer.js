@@ -1,5 +1,9 @@
-import { START_GAME, LEAVE_GAME, CURR_QUES } from "../actions/types";
-import moment from "moment";
+import {
+  START_GAME,
+  LEAVE_GAME,
+  CURR_QUES,
+  START_NEXT_ROUND,
+} from "../actions/types";
 
 const initialState = {
   game_started: false,
@@ -8,6 +12,7 @@ const initialState = {
   location: null,
   all_locations: null,
   currQues: null,
+  round: null,
 };
 
 export default function (state = initialState, action) {
@@ -22,7 +27,12 @@ export default function (state = initialState, action) {
         ...state,
         ...action.payload,
         game_started: true,
-        start_time: moment(action.payload.start_time, "h:mm:ss"),
+        round: 1,
+      };
+    case START_NEXT_ROUND:
+      return {
+        ...state,
+        ...action.payload,
       };
     case LEAVE_GAME:
       return {

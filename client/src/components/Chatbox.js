@@ -28,7 +28,11 @@ import {
 import { startGame, leaveGame } from "../redux/actions/GameActions";
 import { withRouter } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faStar } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUser,
+  faStar,
+  faArrowRight,
+} from "@fortawesome/free-solid-svg-icons";
 
 class Chat extends Component {
   static propTypes = {
@@ -52,9 +56,15 @@ class Chat extends Component {
     rVote: null,
     spy_guess: null,
     nextQuesTimer: null,
+    nextRoundResTimer: null,
+    nextRoundTimer: null,
+    nextRoundResFrag: false,
+    nextRound: true,
   };
 
   onVoteForUser = (idx) => {
+    const { socket, room_id } = this.props.socket;
+    socket.emit("spy_vote", room_id, idx);
     this.setState({ rVote: idx });
   };
 
@@ -62,22 +72,51 @@ class Chat extends Component {
     if (this.props.socket.chat.length > prevProps.socket.chat.length)
       this.scrollToBottom();
     const { room_id, socket } = this.props.socket;
-    const { currQues } = this.props.game;
+    const { currQues, game_started } = this.props.game;
+    const { nextRoundResTimer, nextRoundTimer } = this.state;
     const prevQues = prevProps.game.currQues;
+    if (game_started) {
+      if (!nextRoundResTimer)
+        this.setState({
+          nextRoundResTimer: setTimeout(
+            () => this.setState({ nextRoundResFrag: true }),
+            7 * 60 * 1000
+          ),
+        });
+      if (!nextRoundTimer)
+        this.setState({
+          nextRoundTimer: setTimeout(this.onNextRound, 8 * 60 * 1000),
+        });
+    }
     if (currQues) {
       if (currQues[0].id === socket.id) {
         if (!prevQues)
           this.setState({
-            nextQuesTimer: setTimeout(() => this.getNextQues(), 60 * 1000),
+            nextQuesTimer: setTimeout(this.getNextQues, 60 * 1000),
           });
         else if (prevQues[0].id !== currQues[0].id)
           this.setState({
-            nextQuesTimer: setTimeout(() => this.getNextQues(), 60 * 1000),
+            nextQuesTimer: setTimeout(this.getNextQues, 60 * 1000),
           });
       }
     }
     if (!room_id) this.props.history.push("/");
   }
+
+  onNextRound = () => {
+    this.setState({
+      nextRoundResTimer: null,
+      nextRoundTimer: null,
+      nextRoundResFrag: false,
+      nextRound: false,
+    });
+  };
+
+  onVoteNextRound = (value) => {
+    const { socket, room_id } = this.props.socket;
+    if (value) socket.emit("next_round_vote", room_id);
+    this.setState({ nextRoundResFrag: false });
+  };
 
   getNextQues = () => {
     const { socket, room_id } = this.props.socket;
@@ -98,6 +137,7 @@ class Chat extends Component {
       this.props.leaveRoom(socket);
       this.props.leaveGame();
     }
+    this.onNextRound();
   }
   onChangeHandler = (e) => {
     this.setState({
@@ -108,7 +148,7 @@ class Chat extends Component {
     e.preventDefault();
     const { message } = this.state;
     const { socket } = this.props.socket;
-    this.props.sendMsg(socket, message);
+    if (message && message !== "") this.props.sendMsg(socket, message);
     this.setState({ message: "" });
   };
 
@@ -133,7 +173,7 @@ class Chat extends Component {
       all_locations,
       currQues,
     } = this.props.game;
-    const { rVote } = this.state;
+    const { rVote, nextRoundResFrag } = this.state;
     return (
       <Container fluid>
         <Row className="mt-3 mb-3">
@@ -149,7 +189,7 @@ class Chat extends Component {
                         <Button
                           block
                           color="primary"
-                          onClick={this.onVoteForUser.bind(this, idx)}
+                          onClick={this.onVoteForUser.bind(this, user.id)}
                           active={rVote === idx}
                           key={idx}
                         >
@@ -192,7 +232,17 @@ class Chat extends Component {
                       Start game
                     </Button>
                   ) : (
-                    <Button disabled>Start game</Button>
+                    <span
+                      class="d-inline-block"
+                      tabindex="0"
+                      data-toggle="tooltip"
+                      data-placement="bottom"
+                      title="You need atleast 3 members to play"
+                    >
+                      <Button style={{ pointerEvents: "none" }} disabled>
+                        Start game
+                      </Button>
+                    </span>
                   )}
                 </CardFooter>
               )}
@@ -267,9 +317,30 @@ class Chat extends Component {
           </div>
           <div className="col-lg-8">
             <Card className="chat_div">
+              {nextRoundResFrag && (
+                <CardHeader>
+                  Another Round?
+                  <Button
+                    size="sm"
+                    color="success"
+                    className="ml-2"
+                    onClick={this.onVoteNextRound.bind(this, false)}
+                  >
+                    Yes
+                  </Button>
+                  <Button
+                    size="sm"
+                    color="danger"
+                    className="ml-2"
+                    onClick={this.onVoteNextRound.bind(this, true)}
+                  >
+                    No
+                  </Button>
+                </CardHeader>
+              )}
               <CardBody className="overflow-auto h-100">
-                {chat.map(({ name, msg, time }) => (
-                  <Message name={name} msg={msg} time={time} key={msg} />
+                {chat.map(({ name, msg, time }, idx) => (
+                  <Message name={name} msg={msg} time={time} key={idx} />
                 ))}
                 <div
                   ref={(el) => {
@@ -289,7 +360,7 @@ class Chat extends Component {
                     ></Input>
                     <InputGroupAddon addonType="append">
                       <Button color="primary" type="submit">
-                        Send
+                        <FontAwesomeIcon icon={faArrowRight} />
                       </Button>
                     </InputGroupAddon>
                   </InputGroup>

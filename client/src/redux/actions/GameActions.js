@@ -1,4 +1,11 @@
-import { START_GAME, LEAVE_GAME, CURR_QUES } from "./types";
+import { START_GAME, LEAVE_GAME, CURR_QUES, START_NEXT_ROUND } from "./types";
+
+export const startNextRound = (round) => {
+  return {
+    type: START_NEXT_ROUND,
+    payload: { round },
+  };
+};
 
 export const startGame = (
   start_time,

@@ -9,5 +9,6 @@ export const CLEAR_ERROR = "CLEAR_ERROR";
 export const IS_LOADING = "IS_LOADING";
 export const IS_LOADED = "IS_LOADED";
 export const START_GAME = "START_GAME";
+export const START_NEXT_ROUND = "START_NEXT_ROUND";
 export const LEAVE_GAME = "LEAVE_GAME";
 export const CURR_QUES = "CURR_QUES";

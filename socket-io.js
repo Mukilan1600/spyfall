@@ -34,6 +34,7 @@ const User = (name, id, leader) => {
     name,
     id,
     leader,
+    vote: null,
   };
 };
 
@@ -63,6 +64,8 @@ const generateNewRoom = (user_id) => {
     location: location_list[Math.floor(Math.random() * location_list.length)],
     votes: {},
     currQues: [],
+    nextRoundVote: 0,
+    round: 1,
   };
   return id;
 };
@@ -136,7 +139,7 @@ const startGame = (room_id, user_id) => {
   if (room) {
     if (room.leader === user_id && room.users.length >= 3) {
       room.started = true;
-      room.start_time = moment().format("h:mm:ss");
+      room.start_time = Date.now();
       room.spy = room.users[Math.floor(Math.random() * room.users.length)];
       var user1 = room.users[Math.floor(Math.random() * room.users.length)],
         user2 = room.users[Math.floor(Math.random() * room.users.length)];
@@ -152,6 +155,69 @@ const startGame = (room_id, user_id) => {
         currQues: room.currQues,
       };
     }
+  }
+};
+
+const onNextRoundVote = (room_id) => {
+  if (rooms[room_id]) {
+    rooms[room_id].nextRoundVote += 1;
+  }
+};
+
+const endRound = (room_id) => {
+  if (rooms[room_id]) {
+    const { round, nextRoundVote, users } = rooms[room_id];
+    rooms[room_id].nextRoundVote = 0;
+    rooms[room_id].round++;
+    if (round >= 8 || nextRoundVote >= users.length / 2) {
+      const { users, spy } = rooms[room_id];
+      var votes = {};
+      users.map((user) => {
+        const { vote } = user;
+        if (vote)
+          if (votes[vote]) votes[vote]++;
+          else votes[vote] = 1;
+      });
+
+      if (votes.length < 1)
+        return {
+          end_game: true,
+          round: null,
+          spy_won: true,
+          max_voted_user: null,
+          spy,
+        };
+      else {
+        const max_voted = Object.keys(votes).reduce((a, b) =>
+          votes[a] > votes[b] ? a : b
+        );
+        if (max_voted === spy.id) {
+          return {
+            end_game: true,
+            round: null,
+            spy_won: false,
+            max_voted_user: spy,
+            spy,
+          };
+        } else {
+          const max_voted_user = users.filter((user) => user.id === max_voted);
+          return {
+            end_game: true,
+            round: null,
+            spy_won: true,
+            max_voted_user,
+            spy,
+          };
+        }
+      }
+    } else
+      return {
+        end_game: false,
+        round,
+        spy_won: null,
+        max_voted_user: null,
+        spy: null,
+      };
   }
 };
 
@@ -173,6 +239,21 @@ const getQuesPair = (room_id, user_id) => {
   return [user1, user2];
 };
 
+const isSpy = (room_id, user_id) => {
+  if (rooms[room_id]) return rooms[room_id].spy.id === user_id;
+  return false;
+};
+
+const voteForSpy = (room_id, user_id, voter_id) => {
+  if (rooms[room_id]) {
+    const idx = rooms[room_id].users.findIndex((user) => user.id === voter_id);
+    if (idx !== -1) {
+      rooms[room_id].users[idx].vote = user_id;
+    }
+    console.log(rooms[room_id]);
+  }
+};
+
 module.exports = {
   generateNewRoom,
   joinRoom,
@@ -185,4 +266,8 @@ module.exports = {
   delete_room,
   checkSpyGuess,
   getQuesPair,
+  onNextRoundVote,
+  endRound,
+  isSpy,
+  voteForSpy,
 };
