@@ -250,7 +250,6 @@ const voteForSpy = (room_id, user_id, voter_id) => {
     if (idx !== -1) {
       rooms[room_id].users[idx].vote = user_id;
     }
-    console.log(rooms[room_id]);
   }
 };
 

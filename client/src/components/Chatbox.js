@@ -190,7 +190,7 @@ class Chat extends Component {
                           block
                           color="primary"
                           onClick={this.onVoteForUser.bind(this, user.id)}
-                          active={rVote === idx}
+                          active={rVote === user.id}
                           key={idx}
                         >
                           <FontAwesomeIcon
