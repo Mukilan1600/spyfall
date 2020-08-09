@@ -20,6 +20,7 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
+  Progress,
 } from "reactstrap";
 import Message from "./Message";
 import {
@@ -28,7 +29,11 @@ import {
   getRoomUsers,
   leaveRoom,
 } from "../redux/actions/SocketActions";
-import { startGame, leaveGame } from "../redux/actions/GameActions";
+import {
+  startGame,
+  leaveGame,
+  onNextRound,
+} from "../redux/actions/GameActions";
 import { withRouter } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -37,6 +42,7 @@ import {
   faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { clear_error } from "../redux/actions/ErrorActions";
+import moment from "moment";
 
 class Chat extends Component {
   static propTypes = {
@@ -61,9 +67,10 @@ class Chat extends Component {
     rVote: null,
     spy_guess: null,
     nextQuesTimer: null,
-    nextRoundResFrag: true,
+    nextRoundResFragToggle: false,
     nextRound: true,
     errorModal: false,
+    ResFragProgress: 0,
   };
 
   onVoteForUser = (idx) => {
@@ -75,10 +82,25 @@ class Chat extends Component {
   componentDidUpdate(prevProps, prevState) {
     const { error } = this.props.error;
     const { errorModal } = this.state;
+    const { nextRoundResFrag } = this.props.game;
+    if (!prevProps.game.nextRoundResFrag && nextRoundResFrag)
+      this.setState({
+        nextRoundResFragToggle: true,
+        nextRoundResTimer: setInterval(() => {
+          const { ResFragProgress, nextRoundResTimer } = this.state;
+          this.setState({ ResFragProgress: ResFragProgress + 10 });
+          if (ResFragProgress >= 100) {
+            const { socket } = this.props.socket;
+            this.setState({ nextRoundResFragToggle: false });
+            socket.emit("next_round", room_id);
+
+            clearInterval(nextRoundResTimer);
+            this.setState({ ResFragProgress: 0 });
+          }
+        }, 1000),
+      });
     if (error && error.priority === 1 && !errorModal)
       this.setState({ errorModal: true });
-    if (prevProps.game.end === true && this.props.game.end === false)
-      this.setState({ nextRoundResFrag: true });
     if (this.props.socket.chat.length > prevProps.socket.chat.length)
       this.scrollToBottom();
     const { room_id, socket } = this.props.socket;
@@ -102,7 +124,7 @@ class Chat extends Component {
   onVoteNextRound = (value) => {
     const { socket, room_id } = this.props.socket;
     if (value) socket.emit("next_round_vote", room_id);
-    this.setState({ nextRoundResFrag: false });
+    this.setState({ nextRoundResFragToggle: false });
   };
 
   getNextQues = () => {
@@ -113,7 +135,9 @@ class Chat extends Component {
       clearTimeout(nextQuesTimer);
       this.setState({ nextQuesTimer: null });
     }
-    if (game_started) socket.emit("next_ques", room_id, end);
+    if (game_started) {
+      socket.emit("next_ques", room_id, end);
+    }
   };
 
   componentWillUnmount() {
@@ -184,9 +208,15 @@ class Chat extends Component {
       all_locations,
       currQues,
       end,
+      nextRoundResFrag,
     } = this.props.game;
     const { error } = this.props.error;
-    const { rVote, nextRoundResFrag, errorModal } = this.state;
+    const {
+      rVote,
+      nextRoundResFragToggle,
+      errorModal,
+      ResFragProgress,
+    } = this.state;
     return (
       <Container fluid>
         {error && this.popupErrorModal(errorModal, error)}
@@ -297,27 +327,31 @@ class Chat extends Component {
                             </Button>
                           </React.Fragment>
                         )}
-                        {currQues[0].id === socket.id ? (
-                          <Alert color="info">
-                            <span>You have to question {currQues[1].name}</span>
-                            <Button
-                              className="ml-2"
-                              size="sm"
-                              color="success"
-                              onClick={this.getNextQues}
-                            >
-                              Done!
-                            </Button>
-                          </Alert>
-                        ) : currQues[1].id === socket.id ? (
-                          <Alert color="info">
-                            You have to answer {currQues[0].name}'s questions
-                          </Alert>
-                        ) : (
-                          <Alert color="info">
-                            {currQues[0].name} is questioning {currQues[1].name}
-                          </Alert>
-                        )}
+                        {!nextRoundResFrag &&
+                          (currQues[0].id === socket.id ? (
+                            <Alert color="info">
+                              <span>
+                                You have to question {currQues[1].name}
+                              </span>
+                              <Button
+                                className="ml-2"
+                                size="sm"
+                                color="success"
+                                onClick={this.getNextQues}
+                              >
+                                Done!
+                              </Button>
+                            </Alert>
+                          ) : currQues[1].id === socket.id ? (
+                            <Alert color="info">
+                              You have to answer {currQues[0].name}'s questions
+                            </Alert>
+                          ) : (
+                            <Alert color="info">
+                              {currQues[0].name} is questioning{" "}
+                              {currQues[1].name}
+                            </Alert>
+                          ))}
                       </React.Fragment>
                     )}
                   </CardBody>
@@ -330,8 +364,9 @@ class Chat extends Component {
             </Card>
           </div>
           <div className="col-lg-8">
+            {nextRoundResFrag && <Progress value={ResFragProgress} />}
             <Card className="chat_div">
-              {end && nextRoundResFrag && (
+              {end && nextRoundResFragToggle && (
                 <CardHeader>
                   Another Round?
                   <Button
@@ -354,7 +389,12 @@ class Chat extends Component {
               )}
               <CardBody className="overflow-auto h-100">
                 {chat.map(({ name, msg, time }, idx) => (
-                  <Message name={name} msg={msg} time={time} key={idx} />
+                  <Message
+                    name={name}
+                    msg={msg}
+                    time={moment().format("h:mm")}
+                    key={idx}
+                  />
                 ))}
                 <div
                   ref={(el) => {
@@ -404,5 +444,6 @@ export default compose(
     startGame,
     leaveGame,
     clear_error,
+    onNextRound,
   })
 )(Chat);

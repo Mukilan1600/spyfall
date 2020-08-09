@@ -13,6 +13,7 @@ import {
   getCurrQues,
   startNextRound,
   leaveGame,
+  onNextRound,
 } from "./GameActions";
 import { get_error } from "./ErrorActions";
 import io from "socket.io-client";
@@ -39,6 +40,9 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
             dispatch(recieveMsg(msg));
           });
 
+          socket.on("prompt_next_round", () => {
+            dispatch(onNextRound(true));
+          });
           socket.on("game_over", (error, reason, type, leave_room) => {
             dispatch(leaveGame());
             if (leave_room) dispatch(clear_room_details());

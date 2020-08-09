@@ -3,6 +3,7 @@ import {
   LEAVE_GAME,
   CURR_QUES,
   START_NEXT_ROUND,
+  PROMPT_NEXT,
 } from "../actions/types";
 
 const initialState = {
@@ -14,14 +15,21 @@ const initialState = {
   currQues: null,
   round: null,
   end: false,
+  nextRoundResFrag: false,
 };
 
 export default function (state = initialState, action) {
   switch (action.type) {
+    case PROMPT_NEXT:
+      return {
+        ...state,
+        nextRoundResFrag: action.payload,
+      };
     case CURR_QUES:
       return {
         ...state,
         ...action.payload,
+        nextRoundResFrag: false,
       };
     case START_GAME:
       return {
@@ -35,6 +43,7 @@ export default function (state = initialState, action) {
         ...state,
         ...action.payload,
         end: false,
+        nextRoundResFrag: false,
       };
     case LEAVE_GAME:
       return {
@@ -44,6 +53,7 @@ export default function (state = initialState, action) {
         spy: false,
         location: null,
         end: false,
+        nextRoundResFrag: false,
       };
     default:
       return state;

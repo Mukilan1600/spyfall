@@ -1,9 +1,22 @@
-import { START_GAME, LEAVE_GAME, CURR_QUES, START_NEXT_ROUND } from "./types";
+import {
+  START_GAME,
+  LEAVE_GAME,
+  CURR_QUES,
+  START_NEXT_ROUND,
+  PROMPT_NEXT,
+} from "./types";
 
 export const startNextRound = (round) => {
   return {
     type: START_NEXT_ROUND,
     payload: { round },
+  };
+};
+
+export const onNextRound = (frag) => {
+  return {
+    type: PROMPT_NEXT,
+    payload: frag,
   };
 };
 

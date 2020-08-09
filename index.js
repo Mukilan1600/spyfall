@@ -10,6 +10,7 @@ const server = http.createServer(app);
 const socketio = require("socket.io");
 const io = socketio(server);
 const {
+  resetRoom,
   endRound,
   generateNewRoom,
   joinRoom,
@@ -97,6 +98,7 @@ io.on("connection", (socket) => {
           0
         );
     }
+    resetRoom(room_id);
   });
 
   socket.on("leave_room", () => {
@@ -134,9 +136,21 @@ io.on("connection", (socket) => {
   });
 
   socket.on("next_ques", (room_id, next_round) => {
-    const { currQues, end } = getQuesPair(room_id, socket.id, next_round);
+    if (next_round) {
+      io.to(room_id).emit("prompt_next_round");
+    } else {
+      const { currQues, end } = getQuesPair(room_id, socket.id, next_round);
+      if (currQues) {
+        io.to(room_id).emit("ques_pair", currQues, end);
+      }
+    }
+  });
+
+  socket.on("next_round", (room_id) => {
+    const { currQues, end } = getQuesPair(room_id, socket.id, true);
+    console.log(currQues, end);
     if (currQues) {
-      if (next_round) nextRound(room_id);
+      nextRound(room_id);
       io.to(room_id).emit("ques_pair", currQues, end);
     }
   });

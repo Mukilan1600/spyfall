@@ -12,3 +12,4 @@ export const START_GAME = "START_GAME";
 export const START_NEXT_ROUND = "START_NEXT_ROUND";
 export const LEAVE_GAME = "LEAVE_GAME";
 export const CURR_QUES = "CURR_QUES";
+export const PROMPT_NEXT = "PROMPT_NEXT";

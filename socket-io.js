@@ -101,18 +101,19 @@ const leaveRoom = (room_id, user_id) => {
       const user = rooms[room_id].users.splice(index, 1);
       var end_game = false,
         reason = "";
-      if (rooms[room_id].started) {
-        if (user_id === rooms[room_id].leader) {
-          end_game = true;
-          reason = "The leader has left the game";
-        } else if (user_id === rooms[room_id].spy.id) {
+      if (user_id === rooms[room_id].leader) {
+        end_game = true;
+        reason = "The leader has left the game";
+      } else if (rooms[room_id].started) {
+        if (user_id === rooms[room_id].spy.id) {
           end_game = true;
           reason = "The spy has left the game";
-        } else if (rooms[room_id].users.length < 3 && rooms[room_id].started) {
+        } else if (rooms[room_id].users.length < 3) {
           end_game = true;
           reason = "There is not enough people to continue the game";
         }
       }
+
       if (rooms[room_id].length < 1) delete rooms[room_id];
       return { user, end_game, reason };
     }
@@ -173,6 +174,11 @@ const onNextRoundVote = (room_id) => {
   }
 };
 
+const resetRoom = (room_id) => {
+  rooms[room_id].spy = null;
+  rooms[room_id].started = false;
+};
+
 const endGame = (room_id) => {
   const { users, spy } = rooms[room_id];
   var votes = {};
@@ -182,8 +188,7 @@ const endGame = (room_id) => {
       if (votes[vote]) votes[vote]++;
       else votes[vote] = 1;
   });
-  rooms[room_id].spy = null;
-  rooms[room_id].started = false;
+  resetRoom(room_id);
   if (Object.keys(votes).length === 0)
     return {
       end_game: true,
@@ -288,4 +293,5 @@ module.exports = {
   isSpy,
   voteForSpy,
   endGame,
+  resetRoom,
 };
