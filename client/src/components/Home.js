@@ -8,7 +8,6 @@ import {
 } from "../redux/actions/SocketActions";
 import { clear_error, get_error } from "../redux/actions/ErrorActions";
 import {
-  Progress,
   Form,
   Input,
   Label,
@@ -22,6 +21,7 @@ import {
   ModalFooter,
   Spinner,
   Alert,
+  Row,
 } from "reactstrap";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
@@ -217,9 +217,8 @@ class Home extends React.Component {
         {this.joinRoomModal(joinModal, error)}
         {this.createRoomModal(createModal, error)}
         {error && this.popupErrorModal(errorModal, error)}
-
         <Jumbotron className="text-center mx-auto">
-          <p className="display-4">Spyfall</p>
+          <p className="display-3">Spyfall</p>
           <Button
             className="m-2"
             color="primary"
@@ -236,6 +235,35 @@ class Home extends React.Component {
           >
             Join a room
           </Button>
+          <div style={{ width: 75 + "%" }} className="mx-auto">
+            <p className="mt-3">
+              <b>Rules of Spyfall</b>
+            </p>
+            <ul className="text-justify">
+              <li>
+                Every player except one will be assigned a common location and a
+                role.
+              </li>
+              <li>
+                One person will be a spy whose purpose is to find and bomb the
+                location of the other people.
+              </li>
+              <li>
+                The rounds are split into cycles where each person will ask
+                another person one question of their choice.
+              </li>
+              <li>
+                After each cycle the people will be asked if they want to end
+                the game by guessing who the spy is, if majority votes yes and
+                the spy is chosen correctly the people win else the spy wins. If
+                majority vote no, another cycle of questioning session is had.
+              </li>
+              <li>
+                The spy can at any time choose a location to bomb. If the chosen
+                location is right, the spy wins, else he loses.
+              </li>
+            </ul>
+          </div>
         </Jumbotron>
       </Container>
     );

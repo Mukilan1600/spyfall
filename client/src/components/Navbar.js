@@ -44,7 +44,7 @@ class NavbarDiv extends Component {
     const { time, countdown } = this.state;
     const { game_started } = this.props.game;
     return (
-      <Navbar color="dark" dark expand="md">
+      <Navbar color="dark" dark expand="md" className="mb-3">
         <NavbarBrand href="/">
           <FontAwesomeIcon icon={faUserSecret} className="mr-1" />
           Spyfall
