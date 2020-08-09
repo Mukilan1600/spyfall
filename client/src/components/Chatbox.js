@@ -364,7 +364,6 @@ class Chat extends Component {
             </Card>
           </div>
           <div className="col-lg-8">
-            {nextRoundResFrag && <Progress value={ResFragProgress} />}
             <Card className="chat_div">
               {end && nextRoundResFragToggle && (
                 <CardHeader>
@@ -386,6 +385,18 @@ class Chat extends Component {
                     No
                   </Button>
                 </CardHeader>
+              )}
+              {nextRoundResFrag && (
+                <div className="progress" style={{ height: 2 + "px" }}>
+                  <div
+                    className="progress-bar"
+                    role="progressbar"
+                    style={{ width: ResFragProgress + "%" }}
+                    aria-valuenow={ResFragProgress}
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  ></div>
+                </div>
               )}
               <CardBody className="overflow-auto h-100">
                 {chat.map(({ name, msg, time }, idx) => (

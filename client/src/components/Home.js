@@ -8,6 +8,7 @@ import {
 } from "../redux/actions/SocketActions";
 import { clear_error, get_error } from "../redux/actions/ErrorActions";
 import {
+  Progress,
   Form,
   Input,
   Label,
@@ -216,6 +217,7 @@ class Home extends React.Component {
         {this.joinRoomModal(joinModal, error)}
         {this.createRoomModal(createModal, error)}
         {error && this.popupErrorModal(errorModal, error)}
+
         <Jumbotron className="text-center mx-auto">
           <p className="display-4">Spyfall</p>
           <Button
