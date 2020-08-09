@@ -121,6 +121,8 @@ io.on("connection", (socket) => {
         if (end_game) {
           io.to(room_id).emit("game_over", "Error", reason, 0, 1);
           delete_room(room_id);
+        } else {
+          socket.emit("game_over", null, null, null, 1);
         }
       }
     }

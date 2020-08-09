@@ -107,13 +107,13 @@ class Chat extends Component {
 
   getNextQues = () => {
     const { socket, room_id } = this.props.socket;
-    const { end } = this.props.game;
+    const { end, game_started } = this.props.game;
     const { nextQuesTimer } = this.state;
     if (nextQuesTimer) {
       clearTimeout(nextQuesTimer);
       this.setState({ nextQuesTimer: null });
     }
-    socket.emit("next_ques", room_id, end);
+    if (game_started) socket.emit("next_ques", room_id, end);
   };
 
   componentWillUnmount() {
