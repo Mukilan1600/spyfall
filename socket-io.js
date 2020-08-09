@@ -182,7 +182,8 @@ const endGame = (room_id) => {
       if (votes[vote]) votes[vote]++;
       else votes[vote] = 1;
   });
-
+  rooms[room_id].spy = null;
+  rooms[room_id].started = false;
   if (Object.keys(votes).length === 0)
     return {
       end_game: true,
