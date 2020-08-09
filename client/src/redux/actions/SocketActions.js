@@ -8,7 +8,12 @@ import {
   IS_LOADED,
   CREATE_ROOM,
 } from "./types";
-import { startGame, getCurrQues, startNextRound } from "./GameActions";
+import {
+  startGame,
+  getCurrQues,
+  startNextRound,
+  leaveGame,
+} from "./GameActions";
 import { get_error } from "./ErrorActions";
 import io from "socket.io-client";
 
@@ -27,15 +32,16 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
     if (exists) {
       socket.emit("join_room", room_id, name, (success, reason) => {
         if (success) {
-          socket.on("ques_pair", (currQues) => {
-            dispatch(getCurrQues(currQues));
+          socket.on("ques_pair", (currQues, end) => {
+            dispatch(getCurrQues(currQues, end));
           });
           socket.on("recieve_msg", (msg) => {
             dispatch(recieveMsg(msg));
           });
 
-          socket.on("game_over", (error, reason, type) => {
-            dispatch(clear_room_details());
+          socket.on("game_over", (error, reason, type, leave_room) => {
+            dispatch(leaveGame());
+            if (leave_room) dispatch(clear_room_details());
             if (reason) dispatch(get_error(reason, error, type, 1));
           });
           socket.on("room_users", (users) => {

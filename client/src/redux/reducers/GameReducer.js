@@ -13,6 +13,7 @@ const initialState = {
   all_locations: null,
   currQues: null,
   round: null,
+  end: false,
 };
 
 export default function (state = initialState, action) {
@@ -20,7 +21,7 @@ export default function (state = initialState, action) {
     case CURR_QUES:
       return {
         ...state,
-        currQues: action.payload,
+        ...action.payload,
       };
     case START_GAME:
       return {
@@ -33,6 +34,7 @@ export default function (state = initialState, action) {
       return {
         ...state,
         ...action.payload,
+        end: false,
       };
     case LEAVE_GAME:
       return {
@@ -41,6 +43,7 @@ export default function (state = initialState, action) {
         start_time: null,
         spy: false,
         location: null,
+        end: false,
       };
     default:
       return state;

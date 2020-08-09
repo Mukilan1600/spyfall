@@ -26,6 +26,6 @@ export const leaveGame = () => {
   };
 };
 
-export const getCurrQues = (currQues) => {
-  return { type: CURR_QUES, payload: currQues };
+export const getCurrQues = (currQues, end) => {
+  return { type: CURR_QUES, payload: { currQues, end } };
 };

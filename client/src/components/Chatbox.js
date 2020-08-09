@@ -17,6 +17,9 @@ import {
   ListGroup,
   ListGroupItem,
   Alert,
+  Modal,
+  ModalHeader,
+  ModalBody,
 } from "reactstrap";
 import Message from "./Message";
 import {
@@ -33,11 +36,13 @@ import {
   faStar,
   faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
+import { clear_error } from "../redux/actions/ErrorActions";
 
 class Chat extends Component {
   static propTypes = {
     socket: PropTypes.object.isRequired,
     game: PropTypes.object.isRequired,
+    error: PropTypes.object.isRequired,
   };
 
   scrollToBottom = () => {
@@ -56,10 +61,9 @@ class Chat extends Component {
     rVote: null,
     spy_guess: null,
     nextQuesTimer: null,
-    nextRoundResTimer: null,
-    nextRoundTimer: null,
-    nextRoundResFrag: false,
+    nextRoundResFrag: true,
     nextRound: true,
+    errorModal: false,
   };
 
   onVoteForUser = (idx) => {
@@ -69,25 +73,17 @@ class Chat extends Component {
   };
 
   componentDidUpdate(prevProps, prevState) {
+    const { error } = this.props.error;
+    const { errorModal } = this.state;
+    if (error && error.priority === 1 && !errorModal)
+      this.setState({ errorModal: true });
+    if (prevProps.game.end === true && this.props.game.end === false)
+      this.setState({ nextRoundResFrag: true });
     if (this.props.socket.chat.length > prevProps.socket.chat.length)
       this.scrollToBottom();
     const { room_id, socket } = this.props.socket;
-    const { currQues, game_started } = this.props.game;
-    const { nextRoundResTimer, nextRoundTimer } = this.state;
+    const { currQues } = this.props.game;
     const prevQues = prevProps.game.currQues;
-    if (game_started) {
-      if (!nextRoundResTimer)
-        this.setState({
-          nextRoundResTimer: setTimeout(
-            () => this.setState({ nextRoundResFrag: true }),
-            7 * 60 * 1000
-          ),
-        });
-      if (!nextRoundTimer)
-        this.setState({
-          nextRoundTimer: setTimeout(this.onNextRound, 8 * 60 * 1000),
-        });
-    }
     if (currQues) {
       if (currQues[0].id === socket.id) {
         if (!prevQues)
@@ -103,15 +99,6 @@ class Chat extends Component {
     if (!room_id) this.props.history.push("/");
   }
 
-  onNextRound = () => {
-    this.setState({
-      nextRoundResTimer: null,
-      nextRoundTimer: null,
-      nextRoundResFrag: false,
-      nextRound: false,
-    });
-  };
-
   onVoteNextRound = (value) => {
     const { socket, room_id } = this.props.socket;
     if (value) socket.emit("next_round_vote", room_id);
@@ -120,12 +107,13 @@ class Chat extends Component {
 
   getNextQues = () => {
     const { socket, room_id } = this.props.socket;
+    const { end } = this.props.game;
     const { nextQuesTimer } = this.state;
     if (nextQuesTimer) {
       clearTimeout(nextQuesTimer);
       this.setState({ nextQuesTimer: null });
     }
-    socket.emit("next_ques", room_id);
+    socket.emit("next_ques", room_id, end);
   };
 
   componentWillUnmount() {
@@ -137,7 +125,6 @@ class Chat extends Component {
       this.props.leaveRoom(socket);
       this.props.leaveGame();
     }
-    this.onNextRound();
   }
   onChangeHandler = (e) => {
     this.setState({
@@ -164,6 +151,30 @@ class Chat extends Component {
       socket.emit("spy_guess", spy_guess, room_id);
   };
 
+  onModalToggle = (id) => {
+    this.setState({
+      [id]: !this.state[id],
+    });
+    this.props.clear_error();
+  };
+
+  popupErrorModal = (modalIsOpen, error) => (
+    <Modal
+      isOpen={modalIsOpen}
+      toggle={this.onModalToggle.bind(this, "errorModal")}
+      centered
+    >
+      <ModalHeader toggle={this.onModalToggle.bind(this, "errorModal")}>
+        {error.error}
+      </ModalHeader>
+      <ModalBody>
+        <Alert color={error.type === 0 ? "danger" : "success"}>
+          {error.msg}
+        </Alert>
+      </ModalBody>
+    </Modal>
+  );
+
   render() {
     const { chat, room_id, users, leader, socket } = this.props.socket;
     const {
@@ -172,10 +183,13 @@ class Chat extends Component {
       location,
       all_locations,
       currQues,
+      end,
     } = this.props.game;
-    const { rVote, nextRoundResFrag } = this.state;
+    const { error } = this.props.error;
+    const { rVote, nextRoundResFrag, errorModal } = this.state;
     return (
       <Container fluid>
+        {error && this.popupErrorModal(errorModal, error)}
         <Row className="mt-3 mb-3">
           <div className="col-lg-4">
             <Card style={{ height: "40vh" }}>
@@ -317,7 +331,7 @@ class Chat extends Component {
           </div>
           <div className="col-lg-8">
             <Card className="chat_div">
-              {nextRoundResFrag && (
+              {end && nextRoundResFrag && (
                 <CardHeader>
                   Another Round?
                   <Button
@@ -377,6 +391,7 @@ class Chat extends Component {
 const mapStateToProps = (state) => ({
   socket: state.socket,
   game: state.game,
+  error: state.error,
 });
 
 export default compose(
@@ -388,5 +403,6 @@ export default compose(
     leaveRoom,
     startGame,
     leaveGame,
+    clear_error,
   })
 )(Chat);

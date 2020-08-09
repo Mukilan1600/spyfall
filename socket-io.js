@@ -61,9 +61,10 @@ const generateNewRoom = (user_id) => {
     leader: user_id,
     users: [],
     spy: null,
-    location: location_list[Math.floor(Math.random() * location_list.length)],
-    votes: {},
+    location: null,
     currQues: [],
+    currQuesArr: [],
+    currQuesIdx: null,
     nextRoundVote: 0,
     round: 1,
   };
@@ -138,14 +139,22 @@ const startGame = (room_id, user_id) => {
   const room = rooms[room_id];
   if (room) {
     if (room.leader === user_id && room.users.length >= 3) {
+      room.location =
+        location_list[Math.floor(Math.random() * location_list.length)];
       room.started = true;
       room.start_time = Date.now();
+      var quesArr = [];
+      for (var i = 0; i < room.users.length; i++) quesArr.push(i);
+      quesArr.sort(() => Math.random() - 0.5);
+      room.currQuesArr = quesArr;
+      room.currQuesIdx = 1;
       room.spy = room.users[Math.floor(Math.random() * room.users.length)];
-      var user1 = room.users[Math.floor(Math.random() * room.users.length)],
+      /*var user1 = room.users[Math.floor(Math.random() * room.users.length)],
         user2 = room.users[Math.floor(Math.random() * room.users.length)];
       while (user1 === user2)
         user1 = room.users[Math.floor(Math.random() * room.users.length)];
-      room.currQues = [user1, user2];
+      room.currQues = [user1, user2];*/
+      room.currQues = [room.users[quesArr[0]], room.users[quesArr[1]]];
       return {
         time: room.start_time,
         users: room.users,
@@ -164,52 +173,56 @@ const onNextRoundVote = (room_id) => {
   }
 };
 
+const endGame = (room_id) => {
+  const { users, spy } = rooms[room_id];
+  var votes = {};
+  users.map((user) => {
+    const { vote } = user;
+    if (vote)
+      if (votes[vote]) votes[vote]++;
+      else votes[vote] = 1;
+  });
+
+  if (Object.keys(votes).length === 0)
+    return {
+      end_game: true,
+      round: null,
+      spy_won: true,
+      max_voted_user: null,
+      spy,
+    };
+  else {
+    const max_voted = Object.keys(votes).reduce((a, b) =>
+      votes[a] > votes[b] || votes[a] === votes[b] ? a : b
+    );
+    if (max_voted === spy.id) {
+      return {
+        end_game: true,
+        round: null,
+        spy_won: false,
+        max_voted_user: spy,
+        spy,
+      };
+    } else {
+      const max_voted_user = users.filter((user) => user.id === max_voted)[0];
+      return {
+        end_game: true,
+        round: null,
+        spy_won: true,
+        max_voted_user,
+        spy,
+      };
+    }
+  }
+};
+
 const endRound = (room_id) => {
   if (rooms[room_id]) {
     const { round, nextRoundVote, users } = rooms[room_id];
     rooms[room_id].nextRoundVote = 0;
     rooms[room_id].round++;
-    if (round >= 8 || nextRoundVote >= users.length / 2) {
-      const { users, spy } = rooms[room_id];
-      var votes = {};
-      users.map((user) => {
-        const { vote } = user;
-        if (vote)
-          if (votes[vote]) votes[vote]++;
-          else votes[vote] = 1;
-      });
-
-      if (votes.length < 1)
-        return {
-          end_game: true,
-          round: null,
-          spy_won: true,
-          max_voted_user: null,
-          spy,
-        };
-      else {
-        const max_voted = Object.keys(votes).reduce((a, b) =>
-          votes[a] > votes[b] ? a : b
-        );
-        if (max_voted === spy.id) {
-          return {
-            end_game: true,
-            round: null,
-            spy_won: false,
-            max_voted_user: spy,
-            spy,
-          };
-        } else {
-          const max_voted_user = users.filter((user) => user.id === max_voted);
-          return {
-            end_game: true,
-            round: null,
-            spy_won: true,
-            max_voted_user,
-            spy,
-          };
-        }
-      }
+    if (nextRoundVote >= users.length / 2) {
+      return endGame(room_id);
     } else
       return {
         end_game: false,
@@ -221,22 +234,26 @@ const endRound = (room_id) => {
   }
 };
 
-const getQuesPair = (room_id, user_id) => {
-  if (!rooms[room_id]) return null;
-  if (rooms[room_id].currQues[0].id === user_id) return null;
-  const { users, currQues } = rooms[room_id];
-  var user1 = users[Math.floor(Math.random() * users.length)],
-    user2 = users[Math.floor(Math.random() * users.length)];
-  while (
-    user1.id === user2.id ||
-    currQues[0].id === user1.id ||
-    currQues[1].id === user2.id
-  ) {
-    user1 = users[Math.floor(Math.random() * users.length)];
-    user2 = users[Math.floor(Math.random() * users.length)];
+const getQuesPair = (room_id, user_id, next_round) => {
+  if (!rooms[room_id]) return { currQues: null, end: false };
+  if (rooms[room_id].currQues[0].id !== user_id)
+    return { currQues: null, end: false };
+  if (next_round) {
+    var quesArr = [];
+    for (var i = 0; i < rooms[room_id].users.length; i++) quesArr.push(i);
+    quesArr.sort(() => Math.random() - 0.5);
+    rooms[room_id].currQuesArr = quesArr;
+    rooms[room_id].currQuesIdx = 0;
   }
-  rooms[room_id].currQues = [user1, user2];
-  return [user1, user2];
+  const { currQuesArr, currQuesIdx, users } = rooms[room_id];
+  const end = currQuesIdx >= users.length - 1;
+  const currQues = [
+    users[currQuesArr[currQuesIdx]],
+    users[currQuesArr[(currQuesIdx + 1) % users.length]],
+  ];
+  rooms[room_id].currQues = currQues;
+  rooms[room_id].currQuesIdx++;
+  return { currQues, end };
 };
 
 const isSpy = (room_id, user_id) => {
@@ -269,4 +286,5 @@ module.exports = {
   endRound,
   isSpy,
   voteForSpy,
+  endGame,
 };
