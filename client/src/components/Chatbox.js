@@ -20,7 +20,6 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  Progress,
 } from "reactstrap";
 import Message from "./Message";
 import {
@@ -405,6 +404,15 @@ class Chat extends Component {
                     msg={msg}
                     time={moment().format("h:mm")}
                     key={idx}
+                    type={
+                      currQues
+                        ? name === currQues[0].name
+                          ? 1
+                          : name === currQues[1].name
+                          ? 2
+                          : 0
+                        : 0
+                    }
                   />
                 ))}
                 <div

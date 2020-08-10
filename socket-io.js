@@ -75,6 +75,8 @@ const joinRoom = (room_id, name, user_id) => {
   if (room_id in rooms) {
     if (rooms[room_id].started)
       return { success: false, reason: "The game has already started" };
+    if (rooms[room_id].users.length >= 10)
+      return { success: false, reason: "The room is full" };
     const exists = rooms[room_id].users.findIndex((user) => user.name === name);
     if (exists !== -1)
       return { success: false, reason: "The name is already taken" };

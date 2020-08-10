@@ -126,6 +126,7 @@ class Home extends React.Component {
               id="name"
               name="name"
               onChange={this.onChangeHandler}
+              maxLength={15}
               autoFocus
             />
           </FormGroup>
@@ -177,6 +178,7 @@ class Home extends React.Component {
               id="name"
               name="name"
               onChange={this.onChangeHandler}
+              maxLength={15}
               autoFocus
             />
           </FormGroup>
