@@ -39,8 +39,11 @@ import {
   faUser,
   faStar,
   faArrowRight,
+  faPaste
 } from "@fortawesome/free-solid-svg-icons";
 import { clear_error } from "../redux/actions/ErrorActions";
+//copy to clipboard import
+import copy from "copy-to-clipboard"; 
 
 class Chat extends Component {
   static propTypes = {
@@ -70,6 +73,11 @@ class Chat extends Component {
     errorModal: false,
     ResFragProgress: 0,
   };
+
+
+
+
+
 
   onVoteForUser = (idx) => {
     const { socket, room_id } = this.props.socket;
@@ -120,6 +128,11 @@ class Chat extends Component {
     }
     if (!room_id) this.props.history.push("/");
   }
+  // copying to clipboard
+  Copytext = _rid => {
+    copy(_rid)    
+  }
+
 
   onVoteNextRound = (value) => {
     const { socket, room_id } = this.props.socket;
@@ -228,6 +241,11 @@ class Chat extends Component {
                 Username: {name}
                 <div/>
                 Room ID: {room_id} 
+                <Button className="copy_btn" color="outline-secondary" size="sm"  style={{marginLeft: '10px'}}
+                  onClick={this.Copytext.bind(this,room_id)}
+                >
+                 <FontAwesomeIcon icon={faPaste} /> 
+                </Button>
               </CardHeader>
               <CardBody className="overflow-auto">
                 {game_started && !spy ? (
