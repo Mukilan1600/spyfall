@@ -1,5 +1,5 @@
 package-lock.json
 node_modules/
 react-client/
-spyfall.zip
-spyfall.rar
+*.rar
+*.zip
