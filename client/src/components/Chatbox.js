@@ -200,7 +200,7 @@ class Chat extends Component {
   );
 
   render() {
-    const { room_id, users, leader, socket } = this.props.socket;
+    const { room_id, users, leader, socket, name } = this.props.socket;
     const {
       game_started,
       spy,
@@ -224,7 +224,11 @@ class Chat extends Component {
         <Row className="mt-3 mb-3">
           <div className="col-lg-4">
             <Card style={{ height: "40vh" }}>
-              <CardHeader>Room ID: {room_id}</CardHeader>
+              <CardHeader>
+                Username: {name}
+                <div/>
+                Room ID: {room_id} 
+              </CardHeader>
               <CardBody className="overflow-auto">
                 {game_started && !spy ? (
                   <React.Fragment>
