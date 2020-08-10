@@ -27,6 +27,7 @@ const location_list = [
   "Amazon rain forest",
   "Space station",
   "Mars",
+  "Strip club",
 ];
 
 const User = (name, id, leader) => {
