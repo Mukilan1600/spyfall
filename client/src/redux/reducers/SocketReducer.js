@@ -49,7 +49,6 @@ export default function (state = initial_state, action) {
         ...state,
         room_id: null,
         name: null,
-        chat: [],
         users: [],
         leader: false,
       };
