@@ -1,6 +1,7 @@
 # Spyfall
 A multiplayer guessing game built with nodejs (Backend) and reactjs (Frontend). It uses socketio for server to client communication.
 
+## Installing
 - Install dependencies for backend and frontend using 
 ```
 npm install
@@ -26,3 +27,6 @@ npm run dev
 ```
 npm run build --prefix client
 ```
+
+## Live site
+The working site can be found [here](https://spyfall007.herokuapp.com)
