@@ -148,7 +148,6 @@ io.on("connection", (socket) => {
 
   socket.on("next_round", (room_id) => {
     const { currQues, end } = getQuesPair(room_id, socket.id, true);
-    console.log(currQues, end);
     if (currQues) {
       nextRound(room_id);
       io.to(room_id).emit("ques_pair", currQues, end);

@@ -2,7 +2,6 @@ import {
   INITIALIZE_SOCKET,
   JOIN_ROOM,
   LEAVE_ROOM,
-  RECIEVE_MSG,
   GET_USERS,
   IS_LOADING,
   IS_LOADED,
@@ -13,7 +12,6 @@ const initial_state = {
   socket: null,
   room_id: null,
   name: null,
-  chat: [],
   users: [],
   isLoading: false,
   leader: false,
@@ -54,11 +52,6 @@ export default function (state = initial_state, action) {
         chat: [],
         users: [],
         leader: false,
-      };
-    case RECIEVE_MSG:
-      return {
-        ...state,
-        chat: [...state.chat, action.payload],
       };
     case GET_USERS:
       return {

@@ -41,7 +41,6 @@ import {
   faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { clear_error } from "../redux/actions/ErrorActions";
-import moment from "moment";
 
 class Chat extends Component {
   static propTypes = {
@@ -100,7 +99,7 @@ class Chat extends Component {
       });
     if (error && error.priority === 1 && !errorModal)
       this.setState({ errorModal: true });
-    if (this.props.socket.chat.length > prevProps.socket.chat.length)
+    if (this.props.game.chat.length > prevProps.game.chat.length)
       this.scrollToBottom();
     const { room_id, socket } = this.props.socket;
     const { currQues } = this.props.game;
@@ -199,7 +198,7 @@ class Chat extends Component {
   );
 
   render() {
-    const { chat, room_id, users, leader, socket } = this.props.socket;
+    const { room_id, users, leader, socket } = this.props.socket;
     const {
       game_started,
       spy,
@@ -208,6 +207,7 @@ class Chat extends Component {
       currQues,
       end,
       nextRoundResFrag,
+      chat,
     } = this.props.game;
     const { error } = this.props.error;
     const {
@@ -398,21 +398,13 @@ class Chat extends Component {
                 </div>
               )}
               <CardBody className="overflow-auto h-100">
-                {chat.map(({ name, msg, time }, idx) => (
+                {chat.map(({ name, msg, time, type }, idx) => (
                   <Message
                     name={name}
                     msg={msg}
-                    time={moment().format("h:mm")}
+                    time={time}
                     key={idx}
-                    type={
-                      currQues
-                        ? name === currQues[0].name
-                          ? 1
-                          : name === currQues[1].name
-                          ? 2
-                          : 0
-                        : 0
-                    }
+                    type={type}
                   />
                 ))}
                 <div

@@ -17,6 +17,7 @@ import {
 } from "./GameActions";
 import { get_error } from "./ErrorActions";
 import io from "socket.io-client";
+import moment from "moment";
 
 export const initializeSocket = () => {
   const socket = io();
@@ -36,8 +37,8 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
           socket.on("ques_pair", (currQues, end) => {
             dispatch(getCurrQues(currQues, end));
           });
-          socket.on("recieve_msg", (msg) => {
-            dispatch(recieveMsg(msg));
+          socket.on("recieve_msg", ({ name, msg, time }) => {
+            dispatch(recieveMsg({ name, msg, time: moment().format("h:mm") }));
           });
 
           socket.on("prompt_next_round", () => {

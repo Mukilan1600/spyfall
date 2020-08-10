@@ -68,6 +68,7 @@ const generateNewRoom = (user_id) => {
     currQuesIdx: null,
     nextRoundVote: 0,
     round: 1,
+    prevSpy: null,
   };
   return id;
 };
@@ -152,7 +153,13 @@ const startGame = (room_id, user_id) => {
       quesArr.sort(() => Math.random() - 0.5);
       room.currQuesArr = quesArr;
       room.currQuesIdx = 1;
-      room.spy = room.users[Math.floor(Math.random() * room.users.length)];
+
+      room.prevSpy = room.spy;
+      if (room.prevSpy)
+        while (room.spy.id === room.prevSpy.id)
+          room.spy = room.users[Math.floor(Math.random() * room.users.length)];
+      else room.spy = room.users[Math.floor(Math.random() * room.users.length)];
+
       /*var user1 = room.users[Math.floor(Math.random() * room.users.length)],
         user2 = room.users[Math.floor(Math.random() * room.users.length)];
       while (user1 === user2)
@@ -178,6 +185,7 @@ const onNextRoundVote = (room_id) => {
 };
 
 const resetRoom = (room_id) => {
+  rooms[room_id].prevSpy = rooms[room_id].spy;
   rooms[room_id].spy = null;
   rooms[room_id].started = false;
 };

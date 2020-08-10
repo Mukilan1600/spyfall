@@ -4,6 +4,7 @@ import {
   CURR_QUES,
   START_NEXT_ROUND,
   PROMPT_NEXT,
+  RECIEVE_MSG,
 } from "../actions/types";
 
 const initialState = {
@@ -16,10 +17,25 @@ const initialState = {
   round: null,
   end: false,
   nextRoundResFrag: false,
+  chat: [],
 };
 
 export default function (state = initialState, action) {
   switch (action.type) {
+    case RECIEVE_MSG:
+      const { name, msg, time } = action.payload;
+      const { currQues } = state;
+      const type = currQues
+        ? name === currQues[0].name
+          ? 1
+          : name === currQues[1].name
+          ? 2
+          : 0
+        : 0;
+      return {
+        ...state,
+        chat: [...state.chat, { name, msg, time, type }],
+      };
     case PROMPT_NEXT:
       return {
         ...state,
