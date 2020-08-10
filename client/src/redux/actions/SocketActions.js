@@ -96,6 +96,7 @@ export const createRoom = (socket, name, history) => (dispatch) => {
 };
 
 export const leaveRoom = (socket) => (dispatch) => {
+  clear_room_details();
   socket.emit("leave_room");
 };
 

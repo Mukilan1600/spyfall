@@ -47,14 +47,14 @@ io.on("connection", (socket) => {
           Message("Bot", `${name} has connected!`)
         );
       const users_in_room = getRoomUsers(room_id);
-      io.to(room_id).emit("room_users", users_in_room);
+      if (users_in_room) io.to(room_id).emit("room_users", users_in_room);
     }
   });
 
   socket.on("send_msg", (msg) => {
     const room_id = Object.keys(socket.rooms)[1];
     const user = getUser(room_id, socket.id)[0];
-    io.to(room_id).emit("recieve_msg", Message(user.name, msg));
+    if (user) io.to(room_id).emit("recieve_msg", Message(user.name, msg));
   });
 
   socket.on("spy_guess", (location, room_id) => {

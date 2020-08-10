@@ -137,7 +137,7 @@ const roomExists = (room_id) => {
 
 const getRoomUsers = (room_id) => {
   if (room_id in rooms) return rooms[room_id].users;
-  return false;
+  return [];
 };
 
 const startGame = (room_id, user_id) => {
