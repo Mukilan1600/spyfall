@@ -70,6 +70,7 @@ export default function (state = initialState, action) {
         location: null,
         end: false,
         nextRoundResFrag: false,
+        chat: [],
       };
     default:
       return state;
