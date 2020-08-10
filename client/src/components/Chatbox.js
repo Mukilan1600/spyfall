@@ -102,8 +102,10 @@ class Chat extends Component {
     if (this.props.game.chat.length > prevProps.game.chat.length)
       this.scrollToBottom();
     const { room_id, socket } = this.props.socket;
-    const { currQues } = this.props.game;
+    const { currQues, game_started } = this.props.game;
     const prevQues = prevProps.game.currQues;
+    const prevGame_started = prevProps.game.game_started;
+    if (prevGame_started && !game_started) this.setState({ rVote: null });
     if (currQues) {
       if (currQues[0].id === socket.id) {
         if (!prevQues)
