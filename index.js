@@ -27,7 +27,10 @@ const {
   isSpy,
   voteForSpy,
   endGame,
+  log_details,
 } = require("./socket-io");
+
+setInterval(log_details, 30 * 1000);
 
 io.on("connection", (socket) => {
   socket.on("create_room", (fn) => {

@@ -30,6 +30,16 @@ const location_list = [
   "Strip club",
 ];
 
+const log_details = () => {
+  var no_of_users = 0,
+    no_of_rooms = 0;
+  Object.values(rooms).forEach((room) => {
+    no_of_users += room.users.length;
+    no_of_rooms++;
+  });
+  console.log(`[+++] Rooms: ${no_of_rooms}, Users: ${no_of_users}`);
+};
+
 const User = (name, id, leader) => {
   return {
     name,
@@ -305,4 +315,5 @@ module.exports = {
   voteForSpy,
   endGame,
   resetRoom,
+  log_details,
 };
