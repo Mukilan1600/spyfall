@@ -329,9 +329,11 @@ io.on("connection", (socket) => {
 
 app.use(helmet());
 
-app.use(express.static(path.resolve(__dirname, "client", "build")));
-app.get("*", (req, res) =>
-  res.sendFile(path.resolve(__dirname, "client", "build", "index.html"))
-);
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.resolve(__dirname, "client", "build")));
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"))
+  );
+}
 
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
