@@ -39,12 +39,12 @@ import {
   faUser,
   faStar,
   faArrowRight,
-  faPaste
+  faPaste,
 } from "@fortawesome/free-solid-svg-icons";
 import { clear_error } from "../redux/actions/ErrorActions";
 //copy to clipboard import
 import copy from "copy-to-clipboard";
-import ReactTooltip from 'react-tooltip';
+import ReactTooltip from "react-tooltip";
 
 class Chat extends Component {
   static propTypes = {
@@ -73,13 +73,8 @@ class Chat extends Component {
     nextRound: true,
     errorModal: false,
     ResFragProgress: 0,
-    copied : false
+    copied: false,
   };
-
-
-
-
-
 
   onVoteForUser = (idx) => {
     const { socket, room_id } = this.props.socket;
@@ -131,14 +126,12 @@ class Chat extends Component {
     if (!room_id) this.props.history.push("/");
   }
   // copying to clipboard
-  Copytext = _rid=> {
-    copy(_rid)
+  Copytext = (_rid) => {
+    copy(_rid);
     this.setState({ copied: !this.state.copied }, () => {
-      console.log(this.state.copied)
-  });
-
-  }
-
+      console.log(this.state.copied);
+    });
+  };
 
   onVoteNextRound = (value) => {
     const { socket, room_id } = this.props.socket;
@@ -236,6 +229,7 @@ class Chat extends Component {
       nextRoundResFragToggle,
       errorModal,
       ResFragProgress,
+      copied,
     } = this.state;
 
     return (
@@ -246,15 +240,19 @@ class Chat extends Component {
             <Card style={{ height: "40vh" }}>
               <CardHeader>
                 Username: {name}
-                <div/>
-                Room ID: {room_id}               
-                <t data-tip = {this.state.copied === false ? "Click to Copy":"Copied"} >
-                   <Button className="copy_btn" color="outline-secondary" size="sm"  style={{marginLeft: '10px'}}
-                  onClick={this.Copytext.bind(this,room_id)}
-                >
-                 <FontAwesomeIcon icon={faPaste} /> 
-                 </Button>
-                 <ReactTooltip />
+                <br />
+                Room ID: {room_id}
+                <t data-tip={copied === false ? "Click to Copy" : "Copied"}>
+                  <Button
+                    className="copy_btn"
+                    color="outline-secondary"
+                    size="sm"
+                    style={{ marginLeft: "10px" }}
+                    onClick={this.Copytext.bind(this, room_id)}
+                  >
+                    <FontAwesomeIcon icon={faPaste} />
+                  </Button>
+                  <ReactTooltip />
                 </t>
               </CardHeader>
               <CardBody className="overflow-auto">
@@ -309,17 +307,12 @@ class Chat extends Component {
                       Start game
                     </Button>
                   ) : (
-                    <span
-                      class="d-inline-block"
-                      tabindex="0"
-                      data-toggle="tooltip"
-                      data-placement="bottom"
-                      title="You need atleast 3 members to play"
-                    >
+                    <t data-tip="You need atleast 3 memebers to play this game">
                       <Button style={{ pointerEvents: "none" }} disabled>
                         Start game
                       </Button>
-                    </span>
+                      <ReactTooltip />
+                    </t>
                   )}
                 </CardFooter>
               )}
