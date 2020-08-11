@@ -260,6 +260,7 @@ class Chat extends Component {
                     <ReactTooltip
                       id="copy"
                       effect="solid"
+                      delayHide={1000}
                       getContent={[() => {
                         return (this.state.copy_msg === false ? "Click to Copy":"Copied")
                         }, 1000]}
