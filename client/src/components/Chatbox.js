@@ -129,6 +129,7 @@ class Chat extends Component {
   Copytext = (_rid) => {
     copy(_rid);
     this.setState({ copy_msg: "Copied" });
+    setTimeout(() => this.setState({ copy_msg: "Click to copy" }), 3000);
   };
 
   onVoteNextRound = (value) => {
