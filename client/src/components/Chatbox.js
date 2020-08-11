@@ -73,7 +73,7 @@ class Chat extends Component {
     nextRound: true,
     errorModal: false,
     ResFragProgress: 0,
-    copy_msg: "Click to copy",
+    copy_msg: false,
   };
 
   onVoteForUser = (idx) => {
@@ -126,10 +126,18 @@ class Chat extends Component {
     if (!room_id) this.props.history.push("/");
   }
   // copying to clipboard
+  Copy = (_rid) => {
+    this.Copytext(_rid);
+    setTimeout(() => {
+      this.changeStateCopy();
+    }, 3000);
+  };
+  changeStateCopy = () => {
+    this.setState({ copy_msg: !this.state.copy_msg });
+  };
   Copytext = (_rid) => {
     copy(_rid);
-    this.setState({ copy_msg: "Copied" });
-    setTimeout(() => this.setState({ copy_msg: "Click to copy" }), 3000);
+    this.setState({ copy_msg: !this.state.copy_msg });
   };
 
   onVoteNextRound = (value) => {
@@ -247,13 +255,20 @@ class Chat extends Component {
                     color="outline-secondary"
                     size="sm"
                     style={{ marginLeft: "10px" }}
-                    onClick={this.Copytext.bind(this, room_id)}
+                    onClick={this.Copy.bind(this, room_id)}
                   >
                     <FontAwesomeIcon icon={faPaste} />
                     <ReactTooltip
                       id="copy"
                       effect="solid"
-                      getContent={() => copy_msg}
+                      getContent={[
+                        () => {
+                          return this.state.copy_msg === false
+                            ? "Click to Copy"
+                            : "Copied";
+                        },
+                        1000,
+                      ]}
                     />
                   </Button>
                 </span>
