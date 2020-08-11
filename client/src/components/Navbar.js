@@ -18,10 +18,13 @@ class NavbarDiv extends Component {
   };
 
   componentDidUpdate(prevProps) {
-    const { game_started } = this.props.game;
+    const { game_started, round_time } = this.props.game;
     const { countdown } = this.state;
     if (!countdown && game_started)
-      this.setState({ countdown: true, time: Date.now() + 8 * 60 * 1000 });
+      this.setState({
+        countdown: true,
+        time: Date.now() + round_time * 60 * 1000,
+      });
     if (countdown && !game_started)
       this.setState({ countdown: false, time: null });
   }

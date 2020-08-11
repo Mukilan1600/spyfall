@@ -45,6 +45,7 @@ class Home extends React.Component {
     errorModal: false,
     loading: null,
     error: null,
+    round_time: null,
   };
 
   componentDidUpdate() {
@@ -68,13 +69,13 @@ class Home extends React.Component {
 
   onCreateRoom = (e) => {
     e.preventDefault();
-    const { name } = this.state;
-    if (name !== "") {
+    const { name, round_time } = this.state;
+    if (name !== "" && round_time) {
       this.onModalToggle("createModal");
       const { socket } = this.props.socket;
-      this.props.createRoom(socket, name, this.props.history);
+      this.props.createRoom(round_time, socket, name, this.props.history);
     } else {
-      this.props.get_error("Name cannot be empty");
+      this.props.get_error("Please enter all the fields.");
     }
   };
 
@@ -181,6 +182,18 @@ class Home extends React.Component {
               autoFocus
             />
           </FormGroup>
+          <FormGroup>
+            <Label for="name">Duration</Label>
+            <Input
+              type="number"
+              placeholder="Duration"
+              id="round_time"
+              name="round_time"
+              onChange={this.onChangeHandler}
+              min={8}
+              max={40}
+            />
+          </FormGroup>
           {error && error.priority === 0 && (
             <Alert color="danger">{error.msg}</Alert>
           )}
@@ -219,7 +232,7 @@ class Home extends React.Component {
         {this.createRoomModal(createModal, error)}
         {error && this.popupErrorModal(errorModal, error)}
         <Jumbotron className="text-center mx-auto">
-          <p className="display-3">Spyfall</p>
+          <h1 className="display-3">Spyfall</h1>
           <Button
             className="m-2"
             color="primary"

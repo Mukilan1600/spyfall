@@ -33,9 +33,9 @@ const {
 setInterval(log_details, 30 * 1000);
 
 io.on("connection", (socket) => {
-  socket.on("create_room", (fn) => {
-    const new_room_id = generateNewRoom(socket.id);
-    fn(new_room_id);
+  socket.on("create_room", (time, fn) => {
+    const { id, round_time } = generateNewRoom(time, socket.id);
+    fn(id, round_time);
   });
 
   socket.on("join_room", (room_id, name, fn) => {
@@ -304,10 +304,15 @@ io.on("connection", (socket) => {
 
   socket.on("start_game", () => {
     const room_id = Object.keys(socket.rooms)[1];
-    const { time, users, spy, location, all_locations, currQues } = startGame(
-      room_id,
-      socket.id
-    );
+    const {
+      time,
+      users,
+      spy,
+      location,
+      all_locations,
+      currQues,
+      round_time,
+    } = startGame(room_id, socket.id);
     if (time)
       for (user of users)
         if (user.id === spy.id)
@@ -317,6 +322,7 @@ io.on("connection", (socket) => {
             location: null,
             all_locations,
             currQues,
+            round_time,
           });
         else
           io.to(user.id).emit("game_started", {
@@ -325,6 +331,7 @@ io.on("connection", (socket) => {
             location,
             all_locations: null,
             currQues,
+            round_time,
           });
   });
 });

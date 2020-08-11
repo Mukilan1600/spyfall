@@ -61,7 +61,7 @@ const delete_room = (room_id) => {
   if (rooms[room_id]) delete rooms[room_id];
 };
 
-const generateNewRoom = (user_id) => {
+const generateNewRoom = (round_time, user_id) => {
   const id = Math.random().toString(36).slice(2);
   while (id in rooms) {
     id = Math.random().toString(36).slice(2);
@@ -79,8 +79,9 @@ const generateNewRoom = (user_id) => {
     nextRoundVote: 0,
     round: 1,
     prevSpy: null,
+    round_time,
   };
-  return id;
+  return { id, round_time };
 };
 
 const joinRoom = (room_id, name, user_id) => {
@@ -183,6 +184,7 @@ const startGame = (room_id, user_id) => {
         location: room.location,
         all_locations: location_list,
         currQues: room.currQues,
+        round_time: room.round_time,
       };
     }
   }

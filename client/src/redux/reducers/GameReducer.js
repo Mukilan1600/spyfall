@@ -18,6 +18,7 @@ const initialState = {
   end: false,
   nextRoundResFrag: false,
   chat: [],
+  round_time: null,
 };
 
 export default function (state = initialState, action) {
@@ -71,6 +72,7 @@ export default function (state = initialState, action) {
         end: false,
         nextRoundResFrag: false,
         chat: [],
+        round_time: null,
       };
     default:
       return state;

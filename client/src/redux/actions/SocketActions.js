@@ -54,11 +54,20 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
           });
           socket.on(
             "game_started",
-            ({ time, spy, location, all_locations, currQues }) => {
+            ({ time, spy, location, all_locations, currQues, round_time }) => {
               socket.on("start_next_round", (round) => {
                 dispatch(startNextRound(round));
               });
-              dispatch(startGame(time, spy, location, all_locations, currQues));
+              dispatch(
+                startGame(
+                  time,
+                  spy,
+                  location,
+                  all_locations,
+                  currQues,
+                  round_time
+                )
+              );
             }
           );
           dispatch({
@@ -87,9 +96,9 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
   });
 };
 
-export const createRoom = (socket, name, history) => (dispatch) => {
+export const createRoom = (round_time, socket, name, history) => (dispatch) => {
   dispatch({ type: IS_LOADING });
-  socket.emit("create_room", (room_id) => {
+  socket.emit("create_room", round_time, (room_id) => {
     dispatch({ type: CREATE_ROOM });
     dispatch(joinRoom(socket, room_id, name, history));
   });

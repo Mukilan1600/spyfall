@@ -73,7 +73,7 @@ class Chat extends Component {
     nextRound: true,
     errorModal: false,
     ResFragProgress: 0,
-    copied: false,
+    copy_msg: "Click to copy",
   };
 
   onVoteForUser = (idx) => {
@@ -128,9 +128,7 @@ class Chat extends Component {
   // copying to clipboard
   Copytext = (_rid) => {
     copy(_rid);
-    this.setState({ copied: !this.state.copied }, () => {
-      console.log(this.state.copied);
-    });
+    this.setState({ copy_msg: "Copied" });
   };
 
   onVoteNextRound = (value) => {
@@ -229,7 +227,7 @@ class Chat extends Component {
       nextRoundResFragToggle,
       errorModal,
       ResFragProgress,
-      copied,
+      copy_msg,
     } = this.state;
 
     return (
@@ -242,7 +240,7 @@ class Chat extends Component {
                 Username: {name}
                 <br />
                 Room ID: {room_id}
-                <t data-tip={copied === false ? "Click to Copy" : "Copied"}>
+                <span data-tip={copy_msg} data-for="copy">
                   <Button
                     className="copy_btn"
                     color="outline-secondary"
@@ -251,9 +249,13 @@ class Chat extends Component {
                     onClick={this.Copytext.bind(this, room_id)}
                   >
                     <FontAwesomeIcon icon={faPaste} />
+                    <ReactTooltip
+                      id="copy"
+                      effect="solid"
+                      getContent={() => copy_msg}
+                    />
                   </Button>
-                  <ReactTooltip />
-                </t>
+                </span>
               </CardHeader>
               <CardBody className="overflow-auto">
                 {game_started && !spy ? (
