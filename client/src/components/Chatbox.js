@@ -43,7 +43,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { clear_error } from "../redux/actions/ErrorActions";
 //copy to clipboard import
-import copy from "copy-to-clipboard"; 
+import copy from "copy-to-clipboard";
+import ReactTooltip from 'react-tooltip';
 
 class Chat extends Component {
   static propTypes = {
@@ -72,6 +73,7 @@ class Chat extends Component {
     nextRound: true,
     errorModal: false,
     ResFragProgress: 0,
+    copied : false
   };
 
 
@@ -129,8 +131,12 @@ class Chat extends Component {
     if (!room_id) this.props.history.push("/");
   }
   // copying to clipboard
-  Copytext = _rid => {
-    copy(_rid)    
+  Copytext = _rid=> {
+    copy(_rid)
+    this.setState({ copied: !this.state.copied }, () => {
+      console.log(this.state.copied)
+  });
+
   }
 
 
@@ -231,6 +237,7 @@ class Chat extends Component {
       errorModal,
       ResFragProgress,
     } = this.state;
+
     return (
       <Container fluid>
         {error && this.popupErrorModal(errorModal, error)}
@@ -240,12 +247,15 @@ class Chat extends Component {
               <CardHeader>
                 Username: {name}
                 <div/>
-                Room ID: {room_id} 
-                <Button className="copy_btn" color="outline-secondary" size="sm"  style={{marginLeft: '10px'}}
+                Room ID: {room_id}               
+                <t data-tip = {this.state.copied === false ? "Click to Copy":"Copied"} >
+                   <Button className="copy_btn" color="outline-secondary" size="sm"  style={{marginLeft: '10px'}}
                   onClick={this.Copytext.bind(this,room_id)}
                 >
                  <FontAwesomeIcon icon={faPaste} /> 
-                </Button>
+                 </Button>
+                 <ReactTooltip />
+                </t>
               </CardHeader>
               <CardBody className="overflow-auto">
                 {game_started && !spy ? (
