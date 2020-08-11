@@ -58,6 +58,11 @@ class NavbarDiv extends Component {
               <Countdown date={time} renderer={this.countdownTimer} />
             )}
           </NavItem>
+          <NavItem>
+            <a target="_blank" href="https://github.com/Mukilan1600/spyfall">
+              Github
+            </a>
+          </NavItem>
         </Nav>
       </Navbar>
     );

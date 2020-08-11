@@ -278,6 +278,16 @@ class Home extends React.Component {
               </li>
             </ul>
           </div>
+          <a
+            href="https://hwint.ru/portfolio-item/spyfall/"
+            className="text-decoration-none"
+          >
+            Spyfall
+          </a>{" "}
+          designed by Alexander Ushan &amp; published by{" "}
+          <a href="https://hwint.ru/" className="text-decoration-none">
+            Hobby World
+          </a>
         </Jumbotron>
       </Container>
     );
