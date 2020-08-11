@@ -59,7 +59,12 @@ class NavbarDiv extends Component {
             )}
           </NavItem>
           <NavItem>
-            <a target="_blank" href="https://github.com/Mukilan1600/spyfall">
+            <a
+              target="_blank"
+              href="https://github.com/Mukilan1600/spyfall"
+              className="text-decoration-none"
+              rel="noopener noreferrer"
+            >
               Github
             </a>
           </NavItem>

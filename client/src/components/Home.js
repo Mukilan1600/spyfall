@@ -281,11 +281,18 @@ class Home extends React.Component {
           <a
             href="https://hwint.ru/portfolio-item/spyfall/"
             className="text-decoration-none"
+            target="_blank"
+            rel="noopener noreferrer"
           >
             Spyfall
           </a>{" "}
           designed by Alexander Ushan &amp; published by{" "}
-          <a href="https://hwint.ru/" className="text-decoration-none">
+          <a
+            href="https://hwint.ru/"
+            className="text-decoration-none"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             Hobby World
           </a>
         </Jumbotron>

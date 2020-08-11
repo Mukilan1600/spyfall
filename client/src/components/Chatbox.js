@@ -126,18 +126,19 @@ class Chat extends Component {
     if (!room_id) this.props.history.push("/");
   }
   // copying to clipboard
-  Copy = _rid =>{
-    this.Copytext(_rid)
-    setTimeout(() => { this.changeStateCopy()}, 3000);
-
-  }
-  changeStateCopy =() =>{
-    this.setState({ copy_msg: !this.state.copy_msg })
-  }
-  Copytext = _rid=> {
-    copy(_rid)
-    this.setState({ copy_msg: !this.state.copy_msg })
-  }
+  Copy = (_rid) => {
+    this.Copytext(_rid);
+    setTimeout(() => {
+      this.changeStateCopy();
+    }, 1250);
+  };
+  changeStateCopy = () => {
+    this.setState({ copy_msg: !this.state.copy_msg });
+  };
+  Copytext = (_rid) => {
+    copy(_rid);
+    this.setState({ copy_msg: !this.state.copy_msg });
+  };
 
   onVoteNextRound = (value) => {
     const { socket, room_id } = this.props.socket;
@@ -260,10 +261,15 @@ class Chat extends Component {
                     <ReactTooltip
                       id="copy"
                       effect="solid"
-                      delayHide={500}
-                      getContent={[() => {
-                        return (this.state.copy_msg === false ? "Click to Copy":"Copied")
-                        }, 500]}
+                      delayHide={750}
+                      getContent={[
+                        () => {
+                          return this.state.copy_msg === false
+                            ? "Click to Copy"
+                            : "Copied";
+                        },
+                        1000,
+                      ]}
                     />
                   </Button>
                 </span>
