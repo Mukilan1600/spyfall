@@ -73,6 +73,7 @@ export default function (state = initialState, action) {
         nextRoundResFrag: false,
         chat: [],
         round_time: null,
+        currQues: null,
       };
     default:
       return state;

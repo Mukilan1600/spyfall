@@ -9,10 +9,7 @@ import {
   Input,
   CardFooter,
   CardBody,
-  InputGroup,
-  InputGroupAddon,
   Button,
-  Form,
   CardHeader,
   ListGroup,
   ListGroupItem,
@@ -21,9 +18,7 @@ import {
   ModalHeader,
   ModalBody,
 } from "reactstrap";
-import Message from "./Message";
 import {
-  sendMsg,
   recieveMsg,
   getRoomUsers,
   leaveRoom,
@@ -35,26 +30,17 @@ import {
 } from "../redux/actions/GameActions";
 import { withRouter } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faUser,
-  faStar,
-  faArrowRight,
-  faPaste,
-} from "@fortawesome/free-solid-svg-icons";
+import { faUser, faStar, faPaste } from "@fortawesome/free-solid-svg-icons";
 import { clear_error } from "../redux/actions/ErrorActions";
-//copy to clipboard import
 import copy from "copy-to-clipboard";
 import ReactTooltip from "react-tooltip";
+import ChatDiv from "./ChatDiv";
 
 class Chat extends Component {
   static propTypes = {
     socket: PropTypes.object.isRequired,
     game: PropTypes.object.isRequired,
     error: PropTypes.object.isRequired,
-  };
-
-  scrollToBottom = () => {
-    this.el.scrollIntoView({ behaviour: "smooth" });
   };
 
   componentDidMount() {
@@ -73,7 +59,7 @@ class Chat extends Component {
     nextRound: true,
     errorModal: false,
     ResFragProgress: 0,
-    copy_msg: false,
+    copy_msg: "Click to copy",
   };
 
   onVoteForUser = (idx) => {
@@ -82,30 +68,12 @@ class Chat extends Component {
     this.setState({ rVote: idx });
   };
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     const { error } = this.props.error;
     const { errorModal } = this.state;
-    const { nextRoundResFrag } = this.props.game;
-    if (!prevProps.game.nextRoundResFrag && nextRoundResFrag)
-      this.setState({
-        nextRoundResFragToggle: true,
-        nextRoundResTimer: setInterval(() => {
-          const { ResFragProgress, nextRoundResTimer } = this.state;
-          this.setState({ ResFragProgress: ResFragProgress + 10 });
-          if (ResFragProgress >= 100) {
-            const { socket } = this.props.socket;
-            this.setState({ nextRoundResFragToggle: false });
-            socket.emit("next_round", room_id);
-
-            clearInterval(nextRoundResTimer);
-            this.setState({ ResFragProgress: 0 });
-          }
-        }, 1000),
-      });
     if (error && error.priority === 1 && !errorModal)
       this.setState({ errorModal: true });
-    if (this.props.game.chat.length > prevProps.game.chat.length)
-      this.scrollToBottom();
+
     const { room_id, socket } = this.props.socket;
     const { currQues, game_started } = this.props.game;
     const prevQues = prevProps.game.currQues;
@@ -115,35 +83,24 @@ class Chat extends Component {
       if (currQues[0].id === socket.id) {
         if (!prevQues)
           this.setState({
-            nextQuesTimer: setTimeout(this.getNextQues, 60 * 1000),
+            nextQuesTimer: setTimeout(this.getNextQues, 2 * 60 * 1000),
           });
         else if (prevQues[0].id !== currQues[0].id)
           this.setState({
-            nextQuesTimer: setTimeout(this.getNextQues, 60 * 1000),
+            nextQuesTimer: setTimeout(this.getNextQues, 2 * 60 * 1000),
           });
       }
     }
     if (!room_id) this.props.history.push("/");
   }
-  // copying to clipboard
-  Copy = (_rid) => {
-    this.Copytext(_rid);
-    setTimeout(() => {
-      this.changeStateCopy();
-    }, 1250);
-  };
+
   changeStateCopy = () => {
     this.setState({ copy_msg: !this.state.copy_msg });
   };
   Copytext = (_rid) => {
     copy(_rid);
-    this.setState({ copy_msg: !this.state.copy_msg });
-  };
-
-  onVoteNextRound = (value) => {
-    const { socket, room_id } = this.props.socket;
-    if (value) socket.emit("next_round_vote", room_id);
-    this.setState({ nextRoundResFragToggle: false });
+    this.setState({ copy_msg: "Copied" });
+    setTimeout(() => this.setState({ copy_msg: "Click to copy" }), 1500);
   };
 
   getNextQues = () => {
@@ -173,13 +130,6 @@ class Chat extends Component {
     this.setState({
       [e.target.name]: e.target.value,
     });
-  };
-  onSubmitHandler = (e) => {
-    e.preventDefault();
-    const { message } = this.state;
-    const { socket } = this.props.socket;
-    if (message && message !== "") this.props.sendMsg(socket, message);
-    this.setState({ message: "" });
   };
 
   onGameStart = () => {
@@ -229,18 +179,10 @@ class Chat extends Component {
       location,
       all_locations,
       currQues,
-      end,
       nextRoundResFrag,
-      chat,
     } = this.props.game;
     const { error } = this.props.error;
-    const {
-      rVote,
-      nextRoundResFragToggle,
-      errorModal,
-      ResFragProgress,
-      copy_msg,
-    } = this.state;
+    const { rVote, errorModal, copy_msg } = this.state;
 
     return (
       <Container fluid>
@@ -261,21 +203,14 @@ class Chat extends Component {
                     color="outline-secondary"
                     size="sm"
                     style={{ marginLeft: "10px" }}
-                    onClick={this.Copy.bind(this, room_id)}
+                    onClick={this.Copytext.bind(this, room_id)}
                   >
                     <FontAwesomeIcon icon={faPaste} />
                     <ReactTooltip
                       id="copy"
                       effect="solid"
-                      delayHide={750}
-                      getContent={[
-                        () => {
-                          return this.state.copy_msg === false
-                            ? "Click to Copy"
-                            : "Copied";
-                        },
-                        1000,
-                      ]}
+                      delayHide={500}
+                      getContent={() => copy_msg}
                     />
                   </Button>
                 </span>
@@ -332,12 +267,12 @@ class Chat extends Component {
                       Start game
                     </Button>
                   ) : (
-                    <t data-tip="You need atleast 3 memebers to play this game">
+                    <span data-tip="You need atleast 3 memebers to play this game">
                       <Button style={{ pointerEvents: "none" }} disabled>
                         Start game
                       </Button>
-                      <ReactTooltip />
-                    </t>
+                      <ReactTooltip effect="solid" />
+                    </span>
                   )}
                 </CardFooter>
               )}
@@ -419,86 +354,7 @@ class Chat extends Component {
             </Card>
           </div>
           <div className="col-lg-8">
-            <Card className="chat_div border-1 border-secondary">
-              {end && nextRoundResFragToggle && (
-                <CardHeader className="bg-dark text-white border-0">
-                  Another Round?
-                  <Button
-                    size="sm"
-                    color="success"
-                    className="ml-2"
-                    onClick={this.onVoteNextRound.bind(this, false)}
-                  >
-                    Yes
-                  </Button>
-                  <Button
-                    size="sm"
-                    color="danger"
-                    className="ml-2"
-                    onClick={this.onVoteNextRound.bind(this, true)}
-                  >
-                    No
-                  </Button>
-                </CardHeader>
-              )}
-              {nextRoundResFrag && (
-                <div className="progress" style={{ height: 2 + "px" }}>
-                  <div
-                    className="progress-bar"
-                    role="progressbar"
-                    style={{ width: ResFragProgress + "%" }}
-                    aria-valuenow={ResFragProgress}
-                    aria-valuemin="0"
-                    aria-valuemax="100"
-                  ></div>
-                </div>
-              )}
-              <CardBody className="overflow-auto h-100 bg-black text-white border-0">
-                {chat.map(({ name, msg, time, type }, idx) => (
-                  <Message
-                    name={name}
-                    msg={msg}
-                    time={time}
-                    key={idx}
-                    type={type}
-                  />
-                ))}
-                <div
-                  ref={(el) => {
-                    this.el = el;
-                  }}
-                />
-              </CardBody>
-              <CardFooter className="bg-dark text-white border-0">
-                <Form onSubmit={this.onSubmitHandler}>
-                  <InputGroup>
-                    <Input
-                      type="text"
-                      placeholder="Enter Message..."
-                      name="message"
-                      onChange={this.onChangeHandler}
-                      value={this.state.message}
-                      className="bg-dark text-white border-0"
-                    ></Input>
-                    <InputGroupAddon addonType="append">
-                      <Button
-                        color="success"
-                        type="submit"
-                        disabled={
-                          !game_started
-                            ? false
-                            : !currQues ||
-                              (currQues[0].id !== socket.id &&
-                                currQues[1].id !== socket.id)
-                        }
-                      >
-                        <FontAwesomeIcon icon={faArrowRight} />
-                      </Button>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </Form>
-              </CardFooter>
-            </Card>
+            <ChatDiv />
           </div>
         </Row>
       </Container>
@@ -515,7 +371,6 @@ const mapStateToProps = (state) => ({
 export default compose(
   withRouter,
   connect(mapStateToProps, {
-    sendMsg,
     recieveMsg,
     getRoomUsers,
     leaveRoom,
