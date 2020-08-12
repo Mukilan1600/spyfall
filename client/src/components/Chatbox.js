@@ -280,7 +280,7 @@ class Chat extends Component {
                   </Button>
                 </span>
               </CardHeader>
-              <CardBody className="overflow-auto bg-black text-white border-0">
+              <CardBody className="overflow-auto bg-black text-white border-0 spyvote">
                 {game_started && !spy ? (
                   <React.Fragment>
                     <p>Vote for who you think is the spy: </p>
@@ -482,7 +482,7 @@ class Chat extends Component {
                     ></Input>
                     <InputGroupAddon addonType="append">
                       <Button
-                        color="primary"
+                        color="success"
                         type="submit"
                         disabled={
                           !currQues ||

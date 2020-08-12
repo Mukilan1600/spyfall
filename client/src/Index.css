@@ -2,8 +2,8 @@ body {
   background-color: black;
 }
 
-.btn-success:not(:disabled):not(.disabled).active,
-.btn-success:not(:disabled):not(.disabled):active,
-.show > .btn-success.dropdown-toggle {
+.spyvote > .btn-success:not(:disabled):not(.disabled).active,
+.spyvote > .btn-success:not(:disabled):not(.disabled):active,
+.spyvote > .show > .btn-success.dropdown-toggle {
   background-color: rgb(255, 50, 50);
 }
