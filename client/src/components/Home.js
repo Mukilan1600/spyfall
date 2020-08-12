@@ -259,21 +259,21 @@ class Home extends React.Component {
                 role.
               </li>
               <li>
-                One person will be a spy whose purpose is to find and bomb the
-                location of the other people.
+                One player will be a spy whose purpose is to find and bomb the
+                location of the other players.
               </li>
               <li>
-                The rounds are split into cycles where each person will ask
-                another person one question of their choice.
+                The rounds are split into cycles where each player will ask
+                another player one question of their choice.
               </li>
               <li>
-                After each cycle the people will be asked if they want to end
-                the game by guessing who the spy is, if majority votes yes and
-                the spy is chosen correctly the people win else the spy wins. If
-                majority vote no, another cycle of questioning session is had.
+                After each cycle the players will be asked if they want to end
+                the game by guessing who the spy is, if the majority votes yes and
+                the spy is chosen correctly the players win, else the spy wins. If
+                the majority vote no, another cycle of questions is had.
               </li>
               <li>
-                The spy can at any time choose a location to bomb. If the chosen
+                The spy can choose to bomb a location at any time. If the chosen
                 location is right, the spy wins, else he loses.
               </li>
             </ul>
