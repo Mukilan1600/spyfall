@@ -337,7 +337,6 @@ io.on("connection", (socket) => {
 });
 
 app.use(helmet());
-
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.resolve(__dirname, "client", "build")));
   app.get("*", (req, res) =>
