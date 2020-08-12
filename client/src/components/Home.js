@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import { compose } from "redux";
+import { ReactComponent as Logo } from "./logo.svg";
 import {
   initializeSocket,
   createRoom,
@@ -24,6 +25,7 @@ import {
 } from "reactstrap";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
+import styled, { keyframes } from "styled-components";
 
 class Home extends React.Component {
   static propTypes = {
@@ -31,9 +33,34 @@ class Home extends React.Component {
     error: PropTypes.object.isRequired,
   };
 
+  fade_in = keyframes`
+    to{
+      fill: white;
+    }
+  `;
+
+  line_anim = keyframes`
+    to{
+      stroke-dashoffset: 0px;
+    }
+  `;
+
+  StyledLogo = styled(Logo)`
+    animation: ${this.fade_in} 0.5s ease forwards 2.3s;
+    mask {
+      animation: ${this.fade_in} 0.5s ease forwards 2.3s;
+    }
+    .letter {
+      animation: ${this.line_anim} 2s ease forwards 0.3s;
+    }
+  `;
+
   componentDidMount() {
     const { socket } = this.props.socket;
     if (!socket) this.props.initializeSocket();
+    const logo = document.querySelectorAll("#logo path");
+    for (let i = 0; i < logo.length; i++)
+      console.log(`Letter ${i} = ${logo[i].getTotalLength()}`);
   }
 
   state = {
@@ -242,7 +269,9 @@ class Home extends React.Component {
         {this.createRoomModal(createModal, error)}
         {error && this.popupErrorModal(errorModal, error)}
         <Jumbotron className="text-center mx-auto bg-dark text-white">
-          <h1 className="display-3">Spyfall</h1>
+          <p>
+            <this.StyledLogo />
+          </p>
           <Button
             className="m-2"
             color="primary"
