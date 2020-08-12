@@ -113,11 +113,14 @@ class Home extends React.Component {
       isOpen={modalIsOpen}
       centered
     >
-      <ModalHeader toggle={this.onModalToggle.bind(this, "joinModal")}>
+      <ModalHeader
+        toggle={this.onModalToggle.bind(this, "joinModal")}
+        className="bg-dark text-white border-0"
+      >
         Join room
       </ModalHeader>
       <Form onSubmit={this.onJoinRoom}>
-        <ModalBody>
+        <ModalBody className="bg-black text-white">
           <FormGroup>
             <Label for="name">What's your name?</Label>
             <Input
@@ -128,6 +131,7 @@ class Home extends React.Component {
               onChange={this.onChangeHandler}
               maxLength={15}
               autoFocus
+              className="bg-dark text-white border-0"
             />
           </FormGroup>
           <FormGroup>
@@ -138,13 +142,14 @@ class Home extends React.Component {
               id="id"
               name="room_id"
               onChange={this.onChangeHandler}
+              className="bg-dark text-white border-0"
             />
           </FormGroup>
           {error && error.priority === 0 && (
             <Alert color="danger">{error.msg}</Alert>
           )}
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter className="bg-dark text-white border-0">
           <Button
             className="mr-2"
             onClick={this.onModalToggle.bind(this, "joinModal")}
@@ -165,11 +170,14 @@ class Home extends React.Component {
       isOpen={modalIsOpen}
       centered
     >
-      <ModalHeader toggle={this.onModalToggle.bind(this, "createModal")}>
+      <ModalHeader
+        toggle={this.onModalToggle.bind(this, "createModal")}
+        className="bg-dark text-white border-0"
+      >
         Create a room
       </ModalHeader>
       <Form onSubmit={this.onCreateRoom}>
-        <ModalBody>
+        <ModalBody className="bg-black text-white border-0">
           <FormGroup>
             <Label for="name">What's your name?</Label>
             <Input
@@ -180,6 +188,7 @@ class Home extends React.Component {
               onChange={this.onChangeHandler}
               maxLength={15}
               autoFocus
+              className="bg-dark text-white border-0"
             />
           </FormGroup>
           <FormGroup>
@@ -192,13 +201,14 @@ class Home extends React.Component {
               onChange={this.onChangeHandler}
               min={8}
               max={40}
+              className="bg-dark text-white border-0"
             />
           </FormGroup>
           {error && error.priority === 0 && (
             <Alert color="danger">{error.msg}</Alert>
           )}
         </ModalBody>
-        <ModalFooter>
+        <ModalFooter className="bg-dark text-white border-0">
           <Button
             className="mr-2"
             onClick={this.onModalToggle.bind(this, "createModal")}
@@ -231,7 +241,7 @@ class Home extends React.Component {
         {this.joinRoomModal(joinModal, error)}
         {this.createRoomModal(createModal, error)}
         {error && this.popupErrorModal(errorModal, error)}
-        <Jumbotron className="text-center mx-auto">
+        <Jumbotron className="text-center mx-auto bg-dark text-white">
           <h1 className="display-3">Spyfall</h1>
           <Button
             className="m-2"
@@ -268,9 +278,10 @@ class Home extends React.Component {
               </li>
               <li>
                 After each cycle the players will be asked if they want to end
-                the game by guessing who the spy is, if the majority votes yes and
-                the spy is chosen correctly the players win, else the spy wins. If
-                the majority vote no, another cycle of questions is had.
+                the game by guessing who the spy is, if the majority votes yes
+                and the spy is chosen correctly the players win, else the spy
+                wins. If the majority vote no, another cycle of questions is
+                had.
               </li>
               <li>
                 The spy can choose to bomb a location at any time. If the chosen

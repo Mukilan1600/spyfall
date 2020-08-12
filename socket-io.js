@@ -37,7 +37,8 @@ const log_details = () => {
     no_of_users += room.users.length;
     no_of_rooms++;
   });
-  console.log(`[+++] Rooms: ${no_of_rooms}, Users: ${no_of_users}`);
+  if (no_of_rooms > 0 && no_of_users > 0)
+    console.log(`[+++] Rooms: ${no_of_rooms}, Users: ${no_of_users}`);
 };
 
 const User = (name, id, leader) => {

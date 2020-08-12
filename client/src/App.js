@@ -25,8 +25,8 @@ class App extends Component {
     ) : (
       <BrowserRouter>
         <Provider store={Store}>
-          <Navbar />
-          <div className="App">
+          <div className="app bg-black">
+            <Navbar />
             <Switch>
               <Route path="/room/:id" component={Chat} />
               <Route path="/" component={Home} />
