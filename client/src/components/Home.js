@@ -58,9 +58,6 @@ class Home extends React.Component {
   componentDidMount() {
     const { socket } = this.props.socket;
     if (!socket) this.props.initializeSocket();
-    const logo = document.querySelectorAll("#logo path");
-    for (let i = 0; i < logo.length; i++)
-      console.log(`Letter ${i} = ${logo[i].getTotalLength()}`);
   }
 
   state = {

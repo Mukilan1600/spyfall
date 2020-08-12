@@ -485,9 +485,11 @@ class Chat extends Component {
                         color="success"
                         type="submit"
                         disabled={
-                          !currQues ||
-                          (currQues[0].id !== socket.id &&
-                            currQues[1].id !== socket.id)
+                          !game_started
+                            ? false
+                            : !currQues ||
+                              (currQues[0].id !== socket.id &&
+                                currQues[1].id !== socket.id)
                         }
                       >
                         <FontAwesomeIcon icon={faArrowRight} />
