@@ -267,7 +267,7 @@ class Chat extends Component {
                       Start game
                     </Button>
                   ) : (
-                    <span data-tip="You need atleast 3 memebers to play this game">
+                    <span data-tip="You need atleast 3 members to play this game">
                       <Button style={{ pointerEvents: "none" }} disabled>
                         Start game
                       </Button>
