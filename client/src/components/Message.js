@@ -13,7 +13,10 @@ const Message = (props) => {
           {msg}
         </div>
       ) : type === 1 ? (
-        <div className="border border-info rounded p-1 m-1">
+        <div
+          className="border rounded p-1 m-1"
+          style={{ backgroundColor: "rgba(255,50,50,0.4)" }}
+        >
           <small>
             {name}, {time}
           </small>
@@ -21,7 +24,10 @@ const Message = (props) => {
           {msg}
         </div>
       ) : (
-        <div className="border border-warning rounded p-1 m-1">
+        <div
+          className="border rounded p-1 m-1"
+          style={{ backgroundColor: "rgba(50,255,50,0.4)" }}
+        >
           <small>
             {name}, {time}
           </small>

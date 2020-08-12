@@ -207,10 +207,13 @@ class Chat extends Component {
       toggle={this.onModalToggle.bind(this, "errorModal")}
       centered
     >
-      <ModalHeader toggle={this.onModalToggle.bind(this, "errorModal")}>
+      <ModalHeader
+        toggle={this.onModalToggle.bind(this, "errorModal")}
+        className="bg-dark text-white border-0"
+      >
         {error.error}
       </ModalHeader>
-      <ModalBody>
+      <ModalBody className="bg-black text-white border-0">
         <Alert color={error.type === 0 ? "danger" : "success"}>
           {error.msg}
         </Alert>
@@ -244,8 +247,11 @@ class Chat extends Component {
         {error && this.popupErrorModal(errorModal, error)}
         <Row className="mt-3 mb-3">
           <div className="col-lg-4">
-            <Card style={{ height: "40vh" }}>
-              <CardHeader>
+            <Card
+              style={{ height: "40vh" }}
+              className="border-1 border-secondary"
+            >
+              <CardHeader className="bg-dark text-white border-0">
                 Username: {name}
                 <br />
                 Room ID: {room_id}
@@ -274,7 +280,7 @@ class Chat extends Component {
                   </Button>
                 </span>
               </CardHeader>
-              <CardBody className="overflow-auto">
+              <CardBody className="overflow-auto bg-black text-white border-0">
                 {game_started && !spy ? (
                   <React.Fragment>
                     <p>Vote for who you think is the spy: </p>
@@ -282,7 +288,7 @@ class Chat extends Component {
                       user.id !== socket.id ? (
                         <Button
                           block
-                          color="primary"
+                          color="success"
                           onClick={this.onVoteForUser.bind(this, user.id)}
                           active={rVote === user.id}
                           key={idx}
@@ -294,7 +300,7 @@ class Chat extends Component {
                           {user.name}
                         </Button>
                       ) : (
-                        <Button disabled block color="primary" key={idx}>
+                        <Button disabled block color="success" key={idx}>
                           <FontAwesomeIcon
                             icon={user.leader ? faStar : faUser}
                             className="mr-2"
@@ -308,7 +314,7 @@ class Chat extends Component {
                   <ListGroup>
                     {users &&
                       users.map((user, idx) => (
-                        <ListGroupItem key={idx}>
+                        <ListGroupItem key={idx} color="dark">
                           <FontAwesomeIcon
                             icon={user.leader ? faStar : faUser}
                             className="mr-2"
@@ -320,7 +326,7 @@ class Chat extends Component {
                 )}
               </CardBody>
               {leader && !game_started && (
-                <CardFooter>
+                <CardFooter className="bg-dark text-white border-0">
                   {users.length >= 3 ? (
                     <Button color="success" onClick={this.onGameStart}>
                       Start game
@@ -336,13 +342,16 @@ class Chat extends Component {
                 </CardFooter>
               )}
             </Card>
-            <Card style={{ height: "40vh" }}>
+            <Card
+              style={{ height: "40vh" }}
+              className="border-1 border-secondary"
+            >
               {game_started ? (
                 <React.Fragment>
-                  <CardHeader>
+                  <CardHeader className="bg-dark text-white border-0">
                     {spy ? "You're the spy" : `You are in ${location}`}
                   </CardHeader>
-                  <CardBody className="overflow-auto">
+                  <CardBody className="overflow-auto bg-black text-white border-0">
                     {game_started && (
                       <React.Fragment>
                         {spy && (
@@ -352,6 +361,7 @@ class Chat extends Component {
                               type="select"
                               name="spy_guess"
                               onChange={this.onChangeHandler}
+                              className="bg-dark text-white border-0"
                             >
                               <option disabled hidden selected value="">
                                 Select a location
@@ -402,16 +412,16 @@ class Chat extends Component {
                   </CardBody>
                 </React.Fragment>
               ) : (
-                <CardBody>
+                <CardBody className="bg-black text-white border-0">
                   <Alert color="info">Waiting for the game to start...</Alert>
                 </CardBody>
               )}
             </Card>
           </div>
           <div className="col-lg-8">
-            <Card className="chat_div">
+            <Card className="chat_div border-1 border-secondary">
               {end && nextRoundResFragToggle && (
-                <CardHeader>
+                <CardHeader className="bg-dark text-white border-0">
                   Another Round?
                   <Button
                     size="sm"
@@ -443,7 +453,7 @@ class Chat extends Component {
                   ></div>
                 </div>
               )}
-              <CardBody className="overflow-auto h-100">
+              <CardBody className="overflow-auto h-100 bg-black text-white border-0">
                 {chat.map(({ name, msg, time, type }, idx) => (
                   <Message
                     name={name}
@@ -459,7 +469,7 @@ class Chat extends Component {
                   }}
                 />
               </CardBody>
-              <CardFooter>
+              <CardFooter className="bg-dark text-white border-0">
                 <Form onSubmit={this.onSubmitHandler}>
                   <InputGroup>
                     <Input
@@ -468,9 +478,18 @@ class Chat extends Component {
                       name="message"
                       onChange={this.onChangeHandler}
                       value={this.state.message}
+                      className="bg-dark text-white border-0"
                     ></Input>
                     <InputGroupAddon addonType="append">
-                      <Button color="primary" type="submit">
+                      <Button
+                        color="primary"
+                        type="submit"
+                        disabled={
+                          !currQues ||
+                          (currQues[0].id !== socket.id &&
+                            currQues[1].id !== socket.id)
+                        }
+                      >
                         <FontAwesomeIcon icon={faArrowRight} />
                       </Button>
                     </InputGroupAddon>

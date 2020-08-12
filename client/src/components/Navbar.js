@@ -47,13 +47,13 @@ class NavbarDiv extends Component {
     const { time, countdown } = this.state;
     const { game_started } = this.props.game;
     return (
-      <Navbar color="dark" dark expand="md" className="mb-3">
+      <Navbar dark expand="md" className="mb-3">
         <NavbarBrand href="/">
           <FontAwesomeIcon icon={faUserSecret} className="mr-1" />
           Spyfall
         </NavbarBrand>
         <Nav className="ml-auto" navbar>
-          <NavItem>
+          <NavItem className="mr-3">
             {game_started && countdown && (
               <Countdown date={time} renderer={this.countdownTimer} />
             )}
@@ -62,7 +62,7 @@ class NavbarDiv extends Component {
             <a
               target="_blank"
               href="https://github.com/Mukilan1600/spyfall"
-              className="text-decoration-none"
+              className="text-decoration-none text-white"
               rel="noopener noreferrer"
             >
               Github

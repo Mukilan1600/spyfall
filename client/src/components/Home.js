@@ -225,7 +225,7 @@ class Home extends React.Component {
 
   SpinnerModal = (loading) => (
     <Modal isOpen={loading} centered>
-      <ModalBody className="text-center">
+      <ModalBody className="text-center bg-black text-white border-0">
         <Spinner className="m-4" />
       </ModalBody>
     </Modal>
