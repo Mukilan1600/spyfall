@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Nav, Navbar, NavbarBrand, NavItem, Button } from "reactstrap";
+import { Nav, Navbar, NavbarBrand, NavItem, Button, NavLink } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserSecret } from "@fortawesome/free-solid-svg-icons";
 import { connect } from "react-redux";
@@ -52,21 +52,32 @@ class NavbarDiv extends Component {
           <FontAwesomeIcon icon={faUserSecret} className="mr-1" />
           Spyfall
         </NavbarBrand>
-        <Nav className="ml-auto" navbar>
-          <NavItem className="mr-3">
+        <Nav
+          style={{
+            float: "none",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%,-50%)",
+          }}
+          navbar
+        >
+          <NavItem>
             {game_started && countdown && (
               <Countdown date={time} renderer={this.countdownTimer} />
             )}
           </NavItem>
+        </Nav>
+        <Nav className="ml-auto" navbar>
           <NavItem>
-            <a
+            <NavLink
               target="_blank"
               href="https://github.com/Mukilan1600/spyfall"
               className="text-decoration-none text-white"
               rel="noopener noreferrer"
             >
               Github
-            </a>
+            </NavLink>
           </NavItem>
         </Nav>
       </Navbar>

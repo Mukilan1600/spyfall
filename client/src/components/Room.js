@@ -334,7 +334,7 @@ class Chat extends Component {
                             </Input>
                             <Button
                               color="danger"
-                              className="m-2"
+                              className="mt-2 mb-2"
                               onClick={this.onSpyGuess}
                               block
                             >
