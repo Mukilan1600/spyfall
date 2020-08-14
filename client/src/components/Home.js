@@ -21,6 +21,7 @@ import {
   ModalBody,
   ModalFooter,
   Alert,
+  Spinner,
 } from "reactstrap";
 import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
@@ -53,6 +54,12 @@ class Home extends React.Component {
       animation: ${this.line_anim} 2s ease forwards 0.3s;
     }
   `;
+
+  spinnerStyle = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+  };
 
   componentDidMount() {
     const { socket } = this.props.socket;
@@ -249,79 +256,86 @@ class Home extends React.Component {
   render() {
     const { joinModal, createModal, errorModal } = this.state;
     const { error } = this.props.error;
+    const { isLoading } = this.props.socket;
     return (
       <Container className="vertical-center">
-        {this.joinRoomModal(joinModal, error)}
-        {this.createRoomModal(createModal, error)}
-        {error && this.popupErrorModal(errorModal, error)}
-        <Jumbotron className="text-center mx-auto bg-dark text-white">
-          <p>
-            <this.StyledLogo />
-          </p>
-          <Button
-            className="m-2"
-            color="primary"
-            name="createModal"
-            onClick={this.onModalToggle.bind(this, "createModal")}
-          >
-            Create a room
-          </Button>
-          <Button
-            className="m-2"
-            color="success"
-            name="joinModal"
-            onClick={this.onModalToggle.bind(this, "joinModal")}
-          >
-            Join a room
-          </Button>
-          <div style={{ width: 75 + "%" }} className="mx-auto">
-            <p className="mt-3">
-              <b>Rules of Spyfall</b>
-            </p>
-            <ul className="text-justify">
-              <li>
-                Every player except one will be assigned a common location and a
-                role.
-              </li>
-              <li>
-                One player will be a spy whose purpose is to find and bomb the
-                location of the other players.
-              </li>
-              <li>
-                The rounds are split into cycles where each player will ask
-                another player one question of their choice.
-              </li>
-              <li>
-                After each cycle the players will be asked if they want to end
-                the game by guessing who the spy is, if the majority votes yes
-                and the spy is chosen correctly the players win, else the spy
-                wins. If the majority vote no, another cycle of questions is
-                had.
-              </li>
-              <li>
-                The spy can choose to bomb a location at any time. If the chosen
-                location is right, the spy wins, else he loses.
-              </li>
-            </ul>
-          </div>
-          <a
-            href="https://hwint.ru/portfolio-item/spyfall/"
-            className="text-decoration-none"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Spyfall
-          </a>{" "}
-          designed by Alexander Ushan &amp; published by{" "}
-          <a
-            href="https://hwint.ru/"
-            className="text-decoration-none"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Hobby World
-          </a>
-        </Jumbotron>
+        {isLoading ? (
+          <Spinner color="light" style={this.spinnerStyle} />
+        ) : (
+          <React.Fragment>
+            {this.joinRoomModal(joinModal, error)}
+            {this.createRoomModal(createModal, error)}
+            {error && this.popupErrorModal(errorModal, error)}
+            <Jumbotron className="text-center mx-auto bg-dark text-white">
+              <p>
+                <this.StyledLogo />
+              </p>
+              <Button
+                className="m-2"
+                color="primary"
+                name="createModal"
+                onClick={this.onModalToggle.bind(this, "createModal")}
+              >
+                Create a room
+              </Button>
+              <Button
+                className="m-2"
+                color="success"
+                name="joinModal"
+                onClick={this.onModalToggle.bind(this, "joinModal")}
+              >
+                Join a room
+              </Button>
+              <div style={{ width: 75 + "%" }} className="mx-auto">
+                <p className="mt-3">
+                  <b>Rules of Spyfall</b>
+                </p>
+                <ul className="text-justify">
+                  <li>
+                    Every player except one will be assigned a common location
+                    and a role.
+                  </li>
+                  <li>
+                    One player will be a spy whose purpose is to find and bomb
+                    the location of the other players.
+                  </li>
+                  <li>
+                    The rounds are split into cycles where each player will ask
+                    another player one question of their choice.
+                  </li>
+                  <li>
+                    After each cycle the players will be asked if they want to
+                    end the game by guessing who the spy is, if the majority
+                    votes yes and the spy is chosen correctly the players win,
+                    else the spy wins. If the majority vote no, another cycle of
+                    questions is had.
+                  </li>
+                  <li>
+                    The spy can choose to bomb a location at any time. If the
+                    chosen location is right, the spy wins, else he loses.
+                  </li>
+                </ul>
+              </div>
+              <a
+                href="https://hwint.ru/portfolio-item/spyfall/"
+                className="text-decoration-none"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Spyfall
+              </a>{" "}
+              designed by Alexander Ushan &amp; published by{" "}
+              <a
+                href="https://hwint.ru/"
+                className="text-decoration-none"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Hobby World
+              </a>
+            </Jumbotron>
+          </React.Fragment>
+        )}
       </Container>
     );
   }

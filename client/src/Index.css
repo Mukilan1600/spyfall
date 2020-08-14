@@ -6,4 +6,5 @@ body {
 .spyvote > .btn-success:not(:disabled):not(.disabled):active,
 .spyvote > .show > .btn-success.dropdown-toggle {
   background-color: rgb(255, 50, 50);
+  border-color: rgb(255, 50, 50);
 }

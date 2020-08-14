@@ -31,7 +31,6 @@ export const initializeSocket = () => {
 export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
   dispatch({ type: IS_LOADING });
   socket.emit("check_room_exists", room_id, (exists, room_id) => {
-    dispatch({ type: IS_LOADED });
     if (exists) {
       socket.emit("join_room", room_id, name, (success, reason) => {
         if (success) {
@@ -88,14 +87,17 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
               name,
             },
           });
+          dispatch({ type: IS_LOADED });
         } else {
           dispatch(get_error(reason));
+          dispatch({ type: IS_LOADED });
         }
       });
     } else {
       dispatch(
         get_error("The given room ID is invalid or the room doesn't exist")
       );
+      dispatch({ type: IS_LOADED });
     }
   });
 };
