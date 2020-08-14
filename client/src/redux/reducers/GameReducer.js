@@ -5,6 +5,7 @@ import {
   START_NEXT_ROUND,
   PROMPT_NEXT,
   RECIEVE_MSG,
+  GAME_CHANGE,
 } from "../actions/types";
 
 const initialState = {
@@ -72,8 +73,12 @@ export default function (state = initialState, action) {
         end: false,
         nextRoundResFrag: false,
         chat: [],
-        round_time: null,
         currQues: null,
+      };
+    case GAME_CHANGE:
+      return {
+        ...state,
+        ...action.payload,
       };
     default:
       return state;

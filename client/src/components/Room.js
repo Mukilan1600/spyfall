@@ -30,10 +30,16 @@ import {
 } from "../redux/actions/GameActions";
 import { withRouter } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faStar, faPaste } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUser,
+  faStar,
+  faPaste,
+  faCog,
+} from "@fortawesome/free-solid-svg-icons";
 import { clear_error } from "../redux/actions/ErrorActions";
 import copy from "copy-to-clipboard";
 import ReactTooltip from "react-tooltip";
+import SettingsModal from "./GameSettings";
 import ChatDiv from "./ChatDiv";
 
 class Chat extends Component {
@@ -58,6 +64,7 @@ class Chat extends Component {
     nextRoundResFragToggle: false,
     nextRound: true,
     errorModal: false,
+    settingsModal: false,
     ResFragProgress: 0,
     copy_msg: "Click to copy",
   };
@@ -182,10 +189,18 @@ class Chat extends Component {
       nextRoundResFrag,
     } = this.props.game;
     const { error } = this.props.error;
-    const { rVote, errorModal, copy_msg } = this.state;
+    const { rVote, errorModal, copy_msg, settingsModal } = this.state;
 
     return (
       <Container fluid>
+        <SettingsModal
+          socket={socket}
+          game={this.props.game}
+          isModalOpen={settingsModal}
+          onModalToggle={this.onModalToggle}
+          room_id={room_id}
+        />
+
         {error && this.popupErrorModal(errorModal, error)}
         <Row className="mt-3 mb-3">
           <div className="col-lg-4">
@@ -194,8 +209,18 @@ class Chat extends Component {
               className="border-1 border-secondary"
             >
               <CardHeader className="bg-dark text-white border-0">
-                Username: {name}
-                <br />
+                <p className="mb-1">
+                  <span>Username: {name}</span>
+                  {leader && !game_started && (
+                    <Button
+                      size="sm"
+                      style={{ float: "right" }}
+                      onClick={this.onModalToggle.bind(this, "settingsModal")}
+                    >
+                      <FontAwesomeIcon icon={faCog} s />
+                    </Button>
+                  )}
+                </p>
                 Room ID: {room_id}
                 <span data-tip={copy_msg} data-for="copy">
                   <Button

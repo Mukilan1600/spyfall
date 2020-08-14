@@ -4,6 +4,7 @@ import {
   CURR_QUES,
   START_NEXT_ROUND,
   PROMPT_NEXT,
+  GAME_CHANGE,
 } from "./types";
 
 export const startNextRound = (round) => {
@@ -37,6 +38,13 @@ export const startGame = (
 export const leaveGame = () => {
   return {
     type: LEAVE_GAME,
+  };
+};
+
+export const gameDetailsChanged = (details) => {
+  return {
+    type: GAME_CHANGE,
+    payload: details,
   };
 };
 

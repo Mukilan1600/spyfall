@@ -1,41 +1,57 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./components/Navbar";
 import Room from "./components/Room";
 import { BrowserRouter, Switch, Route } from "react-router-dom";
 import Home from "./components/Home";
-import { Provider } from "react-redux";
-import Store from "./redux/Store";
-import { Spinner } from "reactstrap";
+import { Spinner, Modal, ModalBody } from "reactstrap";
+import PropTypes from "prop-types";
 
 class App extends Component {
-  state = {
-    loading: true,
+  static propTypes = {
+    socket: PropTypes.object.isRequired,
   };
 
   componentDidMount() {
     this.setState({ loading: false });
   }
 
+  state = {
+    loading: true,
+  };
+
+  SpinnerModal = (loading) => (
+    <Modal isOpen={loading} centered>
+      <ModalBody className="text-center bg-black text-white border-0">
+        <Spinner className="m-4" />
+      </ModalBody>
+    </Modal>
+  );
+
   render() {
     const { loading } = this.state;
+    const { isLoading } = this.props.socket;
     return loading ? (
       <Spinner style={{ marginTop: 25 + "%", marginLeft: 50 + "%" }} />
     ) : (
       <BrowserRouter>
-        <Provider store={Store}>
-          <div className="app">
-            <Navbar />
-            <Switch>
-              <Route path="/room/:id" component={Room} />
-              <Route path="/" component={Home} />
-            </Switch>
-          </div>
-        </Provider>
+        <div className="app">
+          {this.SpinnerModal(isLoading)}
+          <Navbar />
+          <Switch>
+            <Route path="/room/:id" component={Room} />
+            <Route path="/" component={Home} />
+          </Switch>
+        </div>
       </BrowserRouter>
     );
   }
 }
 
-export default App;
+const mapStateToProps = (state) => ({
+  socket: state.socket,
+});
+
+export default connect(mapStateToProps)(App);

@@ -96,7 +96,11 @@ const joinRoom = (room_id, name, user_id) => {
       return { success: false, reason: "The name is already taken" };
     const leader = rooms[room_id].leader === user_id;
     rooms[room_id].users.push(User(name, user_id, leader));
-    return { success: true, reason: null };
+    return {
+      success: true,
+      reason: null,
+      round_time: rooms[room_id].round_time,
+    };
   }
 };
 
@@ -189,6 +193,12 @@ const startGame = (room_id, user_id) => {
       };
     }
   }
+};
+
+const updateDetails = (details, room_id) => {
+  Object.keys(details).forEach((key) => {
+    rooms[room_id][key] = details[key];
+  });
 };
 
 const onNextRoundVote = (room_id) => {
@@ -319,4 +329,5 @@ module.exports = {
   endGame,
   resetRoom,
   log_details,
+  updateDetails,
 };

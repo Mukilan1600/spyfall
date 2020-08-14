@@ -14,6 +14,7 @@ import {
   startNextRound,
   leaveGame,
   onNextRound,
+  gameDetailsChanged,
 } from "./GameActions";
 import { get_error } from "./ErrorActions";
 import io from "socket.io-client";
@@ -34,6 +35,9 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
     if (exists) {
       socket.emit("join_room", room_id, name, (success, reason) => {
         if (success) {
+          socket.on("game_change", (details) => {
+            dispatch(gameDetailsChanged(details));
+          });
           socket.on("ques_pair", (currQues, end) => {
             dispatch(getCurrQues(currQues, end));
           });

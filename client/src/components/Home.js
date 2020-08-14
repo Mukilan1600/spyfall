@@ -20,7 +20,6 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-  Spinner,
   Alert,
 } from "reactstrap";
 import PropTypes from "prop-types";
@@ -247,21 +246,11 @@ class Home extends React.Component {
     </Modal>
   );
 
-  SpinnerModal = (loading) => (
-    <Modal isOpen={loading} centered>
-      <ModalBody className="text-center bg-black text-white border-0">
-        <Spinner className="m-4" />
-      </ModalBody>
-    </Modal>
-  );
-
   render() {
     const { joinModal, createModal, errorModal } = this.state;
-    const { isLoading } = this.props.socket;
     const { error } = this.props.error;
     return (
       <Container className="vertical-center">
-        {this.SpinnerModal(isLoading)}
         {this.joinRoomModal(joinModal, error)}
         {this.createRoomModal(createModal, error)}
         {error && this.popupErrorModal(errorModal, error)}

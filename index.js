@@ -28,6 +28,7 @@ const {
   voteForSpy,
   endGame,
   log_details,
+  updateDetails,
 } = require("./socket-io");
 
 setInterval(log_details, 30 * 1000);
@@ -39,7 +40,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("join_room", (room_id, name, fn) => {
-    const { success, reason } = joinRoom(room_id, name, socket.id);
+    const { success, reason, round_time } = joinRoom(room_id, name, socket.id);
     fn(success, reason);
     if (success) {
       socket.join(room_id);
@@ -49,6 +50,7 @@ io.on("connection", (socket) => {
           "recieve_msg",
           Message("Bot", `${name} has connected!`)
         );
+      io.to(room_id).emit("game_change", { round_time });
       const users_in_room = getRoomUsers(room_id);
       if (users_in_room) io.to(room_id).emit("room_users", users_in_room);
     }
@@ -102,6 +104,11 @@ io.on("connection", (socket) => {
         );
     }
     resetRoom(room_id);
+  });
+
+  socket.on("game_change", (details, room_id) => {
+    updateDetails(details, room_id);
+    io.to(room_id).emit("game_change", details);
   });
 
   socket.on("leave_room", () => {
