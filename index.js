@@ -339,6 +339,7 @@ io.on("connection", (socket) => {
             all_locations: null,
             currQues,
             round_time,
+            role: user.role,
           });
   });
 });

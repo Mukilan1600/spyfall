@@ -22,13 +22,297 @@ const location_list = [
   "Bank",
   "Airport",
   "Military base",
-  "Antartica",
+  "Antarctica",
   "Sahara desert",
   "Amazon rain forest",
   "Space station",
   "Mars",
   "Strip club",
 ];
+
+const roles = {
+  "Cruise Ship": [
+    "Manager",
+    "Captain",
+    "waiter",
+    "cleaner",
+    "passenger",
+    "engineer",
+    "lifeguard",
+    "chef",
+    "bartender",
+  ],
+  "5-Start Hotel": [
+    "Manager",
+    "Customer",
+    "Owner",
+    "Bartender",
+    "Waiter",
+    "Maid",
+    "Chef",
+    "Sous-chef",
+    "cleaner",
+    "receptionist",
+    "Prep cook",
+  ],
+  "Local restaurant": [
+    "Manager",
+    "Waiter",
+    "chef",
+    "customer",
+    "cleaner",
+    "Barista",
+    "Drive-thru Operator",
+    "Cashier",
+    "Dishwasher",
+  ],
+  "Police station": [
+    "Police Chief",
+    "Prisoner",
+    "Detective",
+    "Crime Scene Investigator",
+    "Advocate",
+    "Desk officer",
+    "Patrol Officer",
+    "Resource Officer",
+  ],
+  Mall: [
+    "Janitor",
+    "Security",
+    "Electrician",
+    "Manager",
+    "visitor",
+    "Receptionist",
+    "Cashier",
+    "Salesman",
+    "Program Manager",
+    "Software Engineer",
+  ],
+  Beach: [
+    "Lifeguard",
+    "fisher",
+    "tourist",
+    "Stall Owner",
+    "Medic",
+    "Horse-back Officer",
+    "Hotdog vendor",
+    "Fisherman",
+    "Stunt Daredevil",
+  ],
+  "Water park": [
+    "Lifeguard",
+    "Engineer",
+    "Tourist",
+    "Ticket Collector",
+    "Park Manager",
+    "Mascot",
+    "Clerk",
+    "Event Manager",
+    "Medic",
+  ],
+  "Movie studio": [
+    "Actor",
+    "Director",
+    "Assistant Director",
+    "Editor",
+    "Camera Man",
+    "Script Writer",
+    "Assistant Editor",
+    "Vfx Supervisor",
+    "Stuntman",
+  ],
+  Theater: [
+    "Cleaners",
+    "Customer",
+    "Cashier",
+    "Engineer",
+    "Usher",
+    "Projectionist",
+    "Ticket Seller",
+    "Manager",
+  ],
+  Library: [
+    "Librarian",
+    "Library Technician",
+    "Visitor",
+    "Library Assistant",
+    "Janitor,Archivist",
+    "Library Director",
+    "Media Specialist",
+  ],
+  University: [
+    "Professor",
+    "Student",
+    "Principal",
+    "Head of the Department",
+    "Janitor",
+    "Lab assistant",
+    "Cook",
+    "Exams supervisor",
+  ],
+  School: [
+    "Cleaner",
+    "Teacher",
+    "Student",
+    "Lab Assistant",
+    "PE Teacher",
+    "Librarian",
+    "Janitor",
+    "Counselor",
+    "Principal",
+    "Correspondent",
+  ],
+  "Gas station": [
+    "Cleaner",
+    "Worker",
+    "Manager",
+    "Janitor",
+    "Supervisor",
+    "Customer",
+    "Assistant manager",
+    "Pump mechanic",
+  ],
+  "Day spa": [
+    "Customer",
+    "Receptionist",
+    "Therapist",
+    "Janitor",
+    "Masseuse",
+    "Barber",
+    "stylist",
+    "trainee",
+  ],
+  Casino: [
+    "host",
+    "manager",
+    "dealer",
+    "cashier",
+    "customer",
+    "floor staff",
+    "bouncer",
+    "surveillance operator",
+    "security officer",
+    "clerk",
+  ],
+  Park: [
+    "Park Manager",
+    "Cleaner",
+    "Visitor",
+    "Security",
+    "Gardener",
+    "Maintenance worker",
+    "Ticket Collector",
+    "Event Manager",
+    "Medic",
+  ],
+  "Grocery store": [
+    "Owner",
+    "Customer",
+    "Employee",
+    "Clerk",
+    "Cashier",
+    "Staff",
+    "stock clerk",
+    "sales associate",
+  ],
+  Bank: [
+    "Clerk",
+    "fund manager",
+    "trade analyst",
+    "customer",
+    "trader",
+    "compliance officer",
+    "adviser",
+    "operation analyst",
+  ],
+  Airport: [
+    "security",
+    "traveler",
+    "customs",
+    "military men",
+    "Airport Manager",
+    "pilot",
+    "hostess",
+    "air traffic controller",
+    "Aeronautical Engineer",
+    "cleaner",
+  ],
+  "Military base": [
+    "Private",
+    "Medic",
+    "Sergeant",
+    "Major",
+    "Platoon Leader",
+    "Air Force Pilot",
+    "Marine Corp",
+    "Navy Operations Specialist",
+    "field medic",
+  ],
+  Antarctica: [
+    "researcher",
+    "polar bear",
+    "traveler",
+    "eskimo",
+    "data scientist",
+    "Biologist",
+    "Antarctic scientist",
+    "geologist",
+  ],
+  "Sahara desert": [
+    "camel",
+    "nomad",
+    "explorer",
+    "traveler",
+    "travelling trader",
+    "zoologist",
+    "biologist",
+    "desert engineer",
+    "geologist",
+  ],
+  "Amazon rain forest": [
+    "Native",
+    "Tribe men",
+    "Biologist",
+    "Zoologist",
+    "photographer",
+    "explorer",
+    "researcher",
+    "forest ranger",
+    "geologist",
+    "traveler",
+  ],
+  "Space station": [
+    "Astronaut",
+    "Mission Specialist",
+    "Payload Specialist",
+    "Commander",
+    "Sub-Commander",
+    "Flight Engineer",
+    "Spaceflight Participant",
+    "Imposter",
+  ],
+  Mars: [
+    "Astronaut",
+    "Elon Musk",
+    "Martian",
+    "Biologist",
+    "Curiosity rover",
+    "Mission Specialist",
+    "Commander",
+    "Sub-Commander",
+    "Communications Specialist",
+  ],
+  "Strip club": [
+    "Dj",
+    "Stripper",
+    "Bartender",
+    "Waiter",
+    "Customer",
+    "Room Attendant",
+    "Customer Service Representative",
+    "Bouncer",
+  ],
+};
 
 const log_details = () => {
   var no_of_users = 0,
@@ -47,6 +331,7 @@ const User = (name, id, leader) => {
     id,
     leader,
     vote: null,
+    role: null,
   };
 };
 
@@ -162,10 +447,19 @@ const startGame = (room_id, user_id) => {
     if (room.leader === user_id && room.users.length >= 3) {
       room.location =
         location_list[Math.floor(Math.random() * location_list.length)];
+      console.log(room.location, roles[room.location]);
+      while (roles[room.location].length < room.users.length)
+        room.location =
+          location_list[Math.floor(Math.random() * location_list.length)];
       room.started = true;
       room.start_time = Date.now();
       var quesArr = [];
-      for (var i = 0; i < room.users.length; i++) quesArr.push(i);
+      var rolesArr = roles[room.location].splice(0, room.users.length);
+      rolesArr.sort(() => Math.random() - 0.5);
+      for (var i = 0; i < room.users.length; i++) {
+        room.users[i].role = rolesArr[i];
+        quesArr.push(i);
+      }
       quesArr.sort(() => Math.random() - 0.5);
       room.currQuesArr = quesArr;
       room.currQuesIdx = 1;
@@ -176,11 +470,6 @@ const startGame = (room_id, user_id) => {
           room.spy = room.users[Math.floor(Math.random() * room.users.length)];
       else room.spy = room.users[Math.floor(Math.random() * room.users.length)];
 
-      /*var user1 = room.users[Math.floor(Math.random() * room.users.length)],
-        user2 = room.users[Math.floor(Math.random() * room.users.length)];
-      while (user1 === user2)
-        user1 = room.users[Math.floor(Math.random() * room.users.length)];
-      room.currQues = [user1, user2];*/
       room.currQues = [room.users[quesArr[0]], room.users[quesArr[1]]];
       return {
         time: room.start_time,

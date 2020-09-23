@@ -27,11 +27,20 @@ export const startGame = (
   location,
   all_locations,
   currQues,
-  round_time
+  round_time,
+  role
 ) => {
   return {
     type: START_GAME,
-    payload: { start_time, spy, location, all_locations, currQues, round_time },
+    payload: {
+      start_time,
+      spy,
+      location,
+      all_locations,
+      currQues,
+      round_time,
+      role,
+    },
   };
 };
 

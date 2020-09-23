@@ -57,7 +57,15 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
           });
           socket.on(
             "game_started",
-            ({ time, spy, location, all_locations, currQues, round_time }) => {
+            ({
+              time,
+              spy,
+              location,
+              all_locations,
+              currQues,
+              round_time,
+              role,
+            }) => {
               socket.on("start_next_round", (round) => {
                 dispatch(startNextRound(round));
               });
@@ -68,7 +76,8 @@ export const joinRoom = (socket, room_id, name, history) => (dispatch) => {
                   location,
                   all_locations,
                   currQues,
-                  round_time
+                  round_time,
+                  role
                 )
               );
             }

@@ -187,6 +187,7 @@ class Chat extends Component {
       all_locations,
       currQues,
       nextRoundResFrag,
+      role,
     } = this.props.game;
     const { error } = this.props.error;
     const { rVote, errorModal, copy_msg, settingsModal } = this.state;
@@ -309,7 +310,9 @@ class Chat extends Component {
               {game_started ? (
                 <React.Fragment>
                   <CardHeader className="bg-dark text-white border-0">
-                    {spy ? "You're the spy" : `You are in ${location}`}
+                    {spy
+                      ? "You're the spy"
+                      : `You are a ${role} at ${location}`}
                   </CardHeader>
                   <CardBody className="overflow-auto bg-black text-white border-0">
                     {game_started && (

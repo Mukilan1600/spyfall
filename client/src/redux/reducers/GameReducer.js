@@ -20,6 +20,7 @@ const initialState = {
   nextRoundResFrag: false,
   chat: [],
   round_time: null,
+  role: null,
 };
 
 export default function (state = initialState, action) {
@@ -74,6 +75,7 @@ export default function (state = initialState, action) {
         nextRoundResFrag: false,
         chat: [],
         currQues: null,
+        role: null,
       };
     case GAME_CHANGE:
       return {
