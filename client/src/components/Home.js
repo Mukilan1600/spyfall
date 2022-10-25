@@ -27,33 +27,34 @@ import PropTypes from "prop-types";
 import { withRouter } from "react-router-dom";
 import styled, { keyframes } from "styled-components";
 
-class Home extends React.Component {
-  static propTypes = {
-    socket: PropTypes.object.isRequired,
-    error: PropTypes.object.isRequired,
-  };
 
-  fade_in = keyframes`
+const fade_in = keyframes`
     to{
       fill: white;
     }
   `;
 
-  line_anim = keyframes`
+const line_anim = keyframes`
     to{
       stroke-dashoffset: 0px;
     }
   `;
 
-  StyledLogo = styled(Logo)`
-    animation: ${this.fade_in} 0.5s ease forwards 2.3s;
+const StyledLogo = styled(Logo)`
+    animation: ${fade_in} 0.5s ease forwards 2.3s;
     mask {
-      animation: ${this.fade_in} 0.5s ease forwards 2.3s;
+      animation: ${fade_in} 0.5s ease forwards 2.3s;
     }
     .letter {
-      animation: ${this.line_anim} 2s ease forwards 0.3s;
+      animation: ${line_anim} 2s ease forwards 0.3s;
     }
   `;
+
+class Home extends React.Component {
+  static propTypes = {
+    socket: PropTypes.object.isRequired,
+    error: PropTypes.object.isRequired,
+  };
 
   spinnerStyle = {
     position: "absolute",
@@ -268,7 +269,7 @@ class Home extends React.Component {
             {error && this.popupErrorModal(errorModal, error)}
             <Jumbotron className="text-center mx-auto bg-dark text-white">
               <p>
-                <this.StyledLogo />
+                <StyledLogo />
               </p>
               <Button
                 className="m-2"
