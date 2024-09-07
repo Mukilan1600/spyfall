@@ -39,17 +39,7 @@ const line_anim = keyframes`
       stroke-dashoffset: 0px;
     }
   `;
-
-const StyledLogo = styled(Logo)`
-    animation: ${fade_in} 0.5s ease forwards 2.3s;
-    mask {
-      animation: ${fade_in} 0.5s ease forwards 2.3s;
-    }
-    .letter {
-      animation: ${line_anim} 2s ease forwards 0.3s;
-    }
-  `;
-
+  
 class Home extends React.Component {
   static propTypes = {
     socket: PropTypes.object.isRequired,
