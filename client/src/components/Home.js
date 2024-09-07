@@ -269,7 +269,7 @@ class Home extends React.Component {
             {error && this.popupErrorModal(errorModal, error)}
             <Jumbotron className="text-center mx-auto bg-dark text-white">
               <p>
-                <StyledLogo />
+                {/* <StyledLogo /> */}
               </p>
               <Button
                 className="m-2"
