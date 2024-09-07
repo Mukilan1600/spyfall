@@ -21,7 +21,7 @@ import io from "socket.io-client";
 import moment from "moment";
 
 export const initializeSocket = () => {
-  const socket = io();
+  const socket = io('https://spyfall-txta.onrender.com/');
   return {
     type: INITIALIZE_SOCKET,
     payload: socket,
